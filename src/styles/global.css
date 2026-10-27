@@ -1,0 +1,94 @@
+/* Utrecht Eagles — Tailwind CSS v4 theme */
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow:wght@400;500;600&display=swap");
+@import "tailwindcss";
+
+@theme {
+    /* Brand colors (from the logo) */
+    --color-navy: #0A1F33;
+    --color-navy-deep: #06141F;
+    --color-navy-hover: #10304D;
+    --color-gold: #F4B223;
+    --color-gold-dark: #C98A00;
+    --color-gold-ink: #9A6A00;
+    --color-paper: #F4F2EC;
+    --color-paper-dim: #EAE6DC;
+    --color-slate: #3A4B5C;
+
+    --font-display: "Big Shoulders Display", Impact, sans-serif;
+    --font-sans: "Barlow", system-ui, sans-serif;
+
+    --tracking-label: 0.14em;
+    --tracking-eyebrow: 0.32em;
+    --tracking-meta: 0.24em;
+
+    --leading-tightest: 0.84;
+    --leading-display: 0.88;
+
+    --container-site: 1240px;
+    --radius-sharp: 2px;
+    --shadow-card: 0 24px 60px -30px rgb(10 31 51 / 0.45);
+}
+
+@layer base {
+    html { scroll-behavior: smooth; }
+    body { @apply bg-paper text-navy font-sans antialiased; }
+    a { @apply text-navy no-underline hover:text-gold-dark; }
+}
+
+/* Reusable patterns from the design */
+@utility container-site {
+    max-width: var(--container-site);
+    margin-inline: auto;
+    padding-inline: 28px;
+}
+@utility eyebrow {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+}
+@utility display-xl {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: var(--leading-tightest);
+    font-size: clamp(72px, 11vw, 168px);
+}
+@utility display-lg {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: var(--leading-display);
+    font-size: clamp(56px, 7vw, 104px);
+}
+@utility btn {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    padding: 17px 26px;
+    border-radius: var(--radius-sharp);
+}
+@utility text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(244 178 35 / 0.35);
+}
+
+/* Diagonal shapes */
+@utility clip-hero-gold {
+    clip-path: polygon(calc(max(62.5%, 660px) - 26px) 0, 100% 0, 100% 100%, calc(max(42.5%, 480px) - 26px) 100%);
+}
+@utility clip-hero-photo {
+    clip-path: polygon(max(62.5%, 660px) 0, 100% 0, 100% 100%, max(42.5%, 480px) 100%);
+}
+@utility clip-corner-tl {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+@utility clip-join-band {
+    clip-path: polygon(0 0, 100% 0, 100% 62%, 0 86%);
+}
+@utility clip-photo-notch {
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 86% 100%, 0 100%);
+}
