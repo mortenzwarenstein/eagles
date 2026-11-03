@@ -1,0 +1,38 @@
+---
+enum ButtonType {
+    PRIMARY,
+    SECONDARY,
+    OUTLINE
+}
+
+interface Props {
+    type?: ButtonType
+}
+
+const { type = ButtonType.PRIMARY } = Astro.props
+
+const classLists = {
+    primary: ["text-navy-deep", "bg-gold", "hover:bg-white", "hover:text-navy-deep" ],
+    secondary: ["text-gold", "bg-navy-deep"],
+    outline: ["text-gold", "border-gold"],
+}
+let style: string[];
+
+switch(type) {
+    case ButtonType.PRIMARY:
+        style = classLists.primary
+        break;
+    case ButtonType.SECONDARY:
+        style = classLists.secondary
+        break;
+    case ButtonType.OUTLINE:
+        style = classLists.outline
+        break;
+    default:
+        style = classLists.primary
+        break;
+}
+---
+<button class:list={ style } class="font-semibold text-sans py-3 px-5 transition cursor-pointer rounded-xs">
+    <slot />
+</button>

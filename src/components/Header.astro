@@ -1,5 +1,31 @@
 ---
+import Logo from "../assets/images/eag_logo.png"
+import Button from "./Button.astro"
 ---
-<nav>
-    header
-</nav>
+<header class="h-20 bg-navy absolute top-0 left-0 right-0">
+    <div class="flex justify-between items-center gap-5 px-7 py-3 container mx-auto">
+        <a href="/" class="flex justify-center flex-nowrap whitespace-nowrap gap-3">
+            <div class="rounded-full bg-white w-13 h-13 flex items-center">
+                <img src={Logo.src} alt="Eagles Logo" class="h-9 w-auto">
+            </div>
+            <div>
+                <h1 class="font-display text-2xl text-white font-extrabold uppercase tracking-wider hover:text-white">
+                    THE EAGLES
+                    <span class="block text-sm font-display text-gold font-bold uppercase tracking-meta">Utrecht</span>
+                </h1>
+            </div>
+        </a>
+        <nav>
+            <ul class="flex items-center gap-7 font-sans text-sm">
+                <li><a href="" class="text-white font-semibold">ABOUT</a></li>
+                <li><a href="" class="text-white font-semibold">TEAMS</a></li>
+                <li><a href="" class="text-white font-semibold">JOIN</a></li>
+                <li>
+                    <a href="">
+                        <Button>TRY PRACTICE</Button>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
