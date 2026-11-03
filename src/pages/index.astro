@@ -1,6 +1,166 @@
 ---
-import MainLayout from "../layouts/main.astro"
+import Layout from '../layouts/Layout.astro'
+import Header from '../components/Header'
+import MediaSlider from '../components/MediaSlider'
+import Footer from '../components/Footer.astro'
+import ResultCard from '../components/ResultCard.astro'
+import ArrowRight from '../components/icons/ArrowRight.astro'
+import ArrowUpRight from '../components/icons/ArrowUpRight.astro'
+import logo from '../assets/ubv-the-eagles-logo.png'
+
+const heroImage =
+  'https://images.unsplash.com/photo-1783906030964-705d1e457f83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwzfHxiYXNrZXRiYWxsJTIwZ2FtZSUyMGluZG9vciUyMGNvdXJ0JTIwcGxheWVyJTIwYWN0aW9uJTIwZHVuayUyMGNyb3dkfGVufDF8fHx8MTc5MzY5NTE4OXww&ixlib=rb-4.1.0&q=85&w=1600'
+
+const results = [
+  { competition: 'Heren 1', date: 'Za 19 okt', home: 'The Eagles H1', away: 'Riverside Giants', homeScore: 82, awayScore: 71, won: true },
+  { competition: 'Heren 2', date: 'Zo 13 okt', home: 'Eastborough Lions', away: 'The Eagles H2', homeScore: 64, awayScore: 64, won: false },
+  { competition: 'Heren 3', date: 'Za 12 okt', home: 'The Eagles H3', away: 'Park City', homeScore: 76, awayScore: 58, won: true },
+]
+
+const fixtures = [
+  { day: '26', month: 'OKT', time: '20:00', home: 'Kingsport', away: 'Eagles H1', venue: 'Kingsport Sporthal', competition: 'Heren 1' },
+  { day: '27', month: 'OKT', time: '14:30', home: 'Eagles H4', away: 'Oakfield', venue: 'Onze sporthal', competition: 'Heren 4' },
+  { day: '02', month: 'NOV', time: '20:00', home: 'Eagles H2', away: 'Westbridge', venue: 'Onze sporthal', competition: 'Heren 2' },
+]
+
+const teams = [
+  { name: 'Heren 1', league: 'UBV The Eagles', division: '4e', tone: 'bg-[#FFD400]' },
+  { name: 'Heren 2', league: 'UBV The Eagles', division: '5e', tone: 'bg-[#E9E6DE]' },
+  { name: 'Heren 3', league: 'UBV The Eagles', division: '5e', tone: 'bg-[#B8D9FF]' },
+  { name: 'Heren 4', league: 'UBV The Eagles', division: '-', tone: 'bg-[#F1E5CE]' },
+]
+
+const mediaPhotos = [
+  {
+    src: heroImage,
+    alt: 'Basketballer neemt een schot tijdens een wedstrijd',
+    caption: 'Samen op het veld',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1786025124043-eaf17851f696?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxhbWF0ZXVyJTIwYmFza2V0YmFsbCUyMHBsYXllcnMlMjBzcG9ydHMlMjBoYWxsJTIwdGVhbXxlbnwxfHx8fDE3OTM2OTU5MDF8MA&ixlib=rb-4.1.0&q=85&w=1200',
+    alt: 'Basketballers ontmoeten elkaar in de sporthal',
+    caption: 'Een club waar iedereen elkaar kent',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1559369064-c4d65141e408?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxjb21tdW5pdHklMjBiYXNrZXRiYWxsJTIwdGVhbSUyMGZyaWVuZHMlMjBpbmRvb3IlMjBneW0lMjBnYW1lfGVufDF8fHx8MTc5MzY5NTg5Mnww&ixlib=rb-4.1.0&q=85&w=1200',
+    alt: 'Basketbalveld in een sporthal',
+    caption: 'Onze plek voor basketbalplezier',
+  },
+]
 ---
-<MainLayout>
-	<h1>Astro</h1>
-</MainLayout>
+
+<Layout>
+  <Header variant="home" logoSrc={logo.src} client:load />
+
+  <main id="top">
+    <section class="relative flex min-h-[720px] items-end overflow-hidden bg-[#101B33] text-white">
+      <img src={heroImage} alt="Basketballer neemt een schot tijdens een wedstrijd in de sporthal" class="absolute inset-0 size-full object-cover object-center opacity-65" fetchpriority="high" />
+      <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,22,45,0.96)_0%,rgba(10,22,45,0.55)_50%,rgba(10,22,45,0.15)_100%)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(0deg,rgba(10,22,45,0.95)_0%,transparent_58%)]"></div>
+      <div class="relative mx-auto w-full max-w-[1400px] px-5 pb-16 pt-36 sm:px-8 lg:px-12 lg:pb-20">
+        <div class="max-w-4xl">
+          <p class="mb-5 flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#FFD400]">
+            <span class="h-px w-9 bg-[#FFD400]"></span> Een gezellige basketbalclub voor iedereen
+          </p>
+          <h1 class="font-display w-full max-w-[850px] text-[clamp(3.4rem,10vw,9rem)] font-[800] uppercase leading-[0.78] tracking-[-0.045em]">
+            Samen spelen.<br /><span class="whitespace-nowrap text-[#FFD400]">Samen groeien.</span>
+          </h1>
+          <div class="mt-8 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+            <a href="#fixtures" class="flex items-center gap-3 bg-[#FFD400] px-6 py-4 text-xs font-extrabold uppercase tracking-[0.14em] text-[#101B33] transition hover:bg-white">
+              Ontdek onze club <ArrowRight />
+            </a>
+            <p class="max-w-xs text-sm leading-6 text-white/70">Basketbal in Utrecht doe je bij UBV The Eagles, één van de oudste, kleinste en gezelligste basketballverenigingen van Utrecht! Kijk rond voor alle clubinfo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="absolute bottom-0 right-0 hidden border-l border-t border-white/20 bg-[#101B33]/70 px-8 py-5 backdrop-blur-md lg:block">
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">Volgende thuiswedstrijd</p>
+        <p class="mt-1 font-display text-lg font-bold uppercase">The Eagles tegen Westbridge · 02 nov</p>
+      </div>
+    </section>
+
+    <section id="results" class="bg-[#101B33] py-16 text-white sm:py-20">
+      <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+        <div class="mb-9 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+          <div>
+            <p class="section-kicker text-[#FFD400]">Eindstand</p>
+            <h2 class="section-title text-white">Laatste uitslagen</h2>
+          </div>
+          <a href="#results" class="link-arrow text-white">Alle uitslagen <ArrowUpRight /></a>
+        </div>
+        <div class="flex gap-4 overflow-x-auto pb-3">
+          {results.map((result) => <ResultCard result={result} />)}
+        </div>
+      </div>
+    </section>
+
+    <section id="fixtures" class="py-20 sm:py-28">
+      <div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
+        <div>
+          <p class="section-kicker">Binnenkort</p>
+          <h2 class="section-title">Volgende<br />wedstrijden</h2>
+          <p class="mt-5 max-w-sm text-sm leading-6 text-[#101B33]/60">Kom gezellig kijken en moedig Heren 1, 2, 3 en 4 aan bij hun volgende wedstrijd.</p>
+          <a href="#fixtures" class="link-arrow mt-7">Volledig programma <ArrowRight /></a>
+        </div>
+        <div class="border-t border-[#101B33]/20">
+          {fixtures.map((fixture) => (
+            <article class="grid grid-cols-[58px_1fr_auto] items-center gap-4 border-b border-[#101B33]/20 py-6 transition hover:bg-white/60 sm:grid-cols-[70px_1fr_1fr_auto] sm:gap-7">
+              <div class="border-r border-[#101B33]/15">
+                <span class="font-score block text-4xl leading-none">{fixture.day}</span>
+                <span class="text-[10px] font-extrabold tracking-[0.16em] text-[#101B33]/50">{fixture.month}</span>
+              </div>
+              <div>
+                <p class="font-display text-xl font-bold uppercase sm:text-2xl">{fixture.home} <span class="text-[#101B33]/35">tegen</span> {fixture.away}</p>
+                <p class="mt-1 text-xs text-[#101B33]/50 sm:hidden">{fixture.competition}</p>
+              </div>
+              <div class="hidden sm:block">
+                <p class="text-xs font-bold">{fixture.competition}</p>
+                <p class="mt-1 text-xs text-[#101B33]/50">{fixture.venue}</p>
+              </div>
+              <div class="text-right">
+                <span class="font-score text-xl">{fixture.time}</span>
+                <ArrowUpRight class="ml-auto mt-2 size-4 text-[#101B33]/40" />
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="teams" class="bg-white py-20 sm:py-28">
+      <div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+        <div class="mb-10 flex flex-col justify-between gap-7 lg:flex-row lg:items-end">
+          <div>
+            <p class="section-kicker">Vier teams, één vereniging</p>
+            <h2 class="section-title">Onze teams</h2>
+          </div>
+          <p class="max-w-md text-sm leading-6 text-[#101B33]/60">Van Heren 1 tot en met Heren 4: vier teams met ieder hun eigen niveau, maar dezelfde gezellige Eagles-sfeer.</p>
+        </div>
+        <div class="grid gap-px bg-[#101B33]/15 md:grid-cols-2 xl:grid-cols-4">
+          {teams.map((team, index) => (
+            <article class={`${team.tone} group min-h-[390px] p-7 sm:p-9`}>
+              <div class="flex items-start justify-between">
+                <span class="text-xs font-bold uppercase tracking-[0.15em]">0{index + 1}</span>
+                <span class="flex size-10 items-center justify-center rounded-full border border-[#101B33]/25 transition group-hover:rotate-45 group-hover:bg-[#101B33] group-hover:text-white"><ArrowUpRight /></span>
+              </div>
+              <div class="mt-28">
+                <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#101B33]/50">{team.league}</p>
+                <h3 class="font-display mt-3 text-4xl font-black uppercase leading-none">{team.name}</h3>
+                <div class="mt-8 flex items-end gap-3 border-t border-[#101B33]/20 pt-5">
+                  <span class="font-score text-5xl leading-none">{team.division}</span>
+                  <span class="pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#101B33]/50">Divisie</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="media" class="overflow-hidden bg-[#FFD400]">
+      <MediaSlider photos={mediaPhotos} client:visible />
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

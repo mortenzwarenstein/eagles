@@ -1,5 +1,28 @@
 ---
+interface Props {
+  variant?: 'home' | 'schedule'
+}
+const { variant = 'home' } = Astro.props
 ---
-<footer>
-    footer
+
+<footer class="border-t border-white/15 bg-[#101B33] px-5 py-8 text-white sm:px-8">
+  <div
+    class:list={[
+      'mx-auto flex max-w-[1400px] flex-col justify-between gap-5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/40 sm:flex-row',
+      variant === 'schedule' && 'lg:px-4',
+    ]}
+  >
+    <p>© 2025 UBV The Eagles</p>
+    {
+      variant === 'schedule' ? (
+        <a href="/" class="transition hover:text-white">Terug naar home</a>
+      ) : (
+        <div class="flex gap-6">
+          <a href="#top" class="transition hover:text-white">Instagram</a>
+          <a href="#top" class="transition hover:text-white">YouTube</a>
+          <a href="#top" class="transition hover:text-white">Contact</a>
+        </div>
+      )
+    }
+  </div>
 </footer>
