@@ -1,0 +1,19 @@
+---
+// Loading placeholder with the same dimensions as ResultRow, so nothing shifts once data arrives.
+const bar = "inline-block rounded-sm bg-white/10 align-middle"
+---
+<li aria-hidden="true" class="grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-4 border border-white/15 bg-white/6 p-5 sm:grid-cols-[9rem_1fr_auto] sm:gap-x-8 motion-safe:animate-pulse">
+	<span class="text-xs leading-4"><span class:list={[bar, "h-3 w-14"]}></span></span>
+	<div class="min-w-0 space-y-2">
+		{[0, 1].map(() => (
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-1 items-center gap-3">
+					<span class="size-6 shrink-0 rounded-full bg-white/10"></span>
+					<span class:list={[bar, "h-4 w-1/2"]}></span>
+				</div>
+				<span class="font-score text-2xl"><span class:list={[bar, "h-[0.8em] w-8"]}></span></span>
+			</div>
+		))}
+	</div>
+	<span class="h-6 w-16 bg-white/10 sm:w-20"></span>
+</li>

@@ -18,7 +18,12 @@ const home = defineCollection({
 			cta: z.object({ label: z.string(), href: z.string() }),
 			intro: z.string(),
 		}),
-		results: z.object({ kicker: z.string(), title: z.string(), linkLabel: z.string() }),
+		results: z.object({
+			kicker: z.string(),
+			title: z.string(),
+			linkLabel: z.string(),
+			page: z.object({ pageTitle: z.string(), pageIntro: z.string(), metaTitle: z.string(), metaDescription: z.string() }),
+		}),
 		fixtures: z.object({
 			kicker: z.string(),
 			title: z.string(),

@@ -89,6 +89,9 @@ export async function fetchMatches(locale = "nl-NL"): Promise<Match[]> {
 	return data.wedstrijden.map((m) => toMatch(m, now, format)).sort((a, b) => a.date.localeCompare(b.date))
 }
 
+/** Name of the club's own team in a match, e.g. "The Eagles MSE 1". */
+export const ourTeam = (match: Match) => (match.homeIsUs ? match.home : match.away)
+
 /** Played matches, newest first. */
 export function selectResults(matches: Match[], limit?: number): Match[] {
 	const results = matches.filter((m) => m.played).reverse()
