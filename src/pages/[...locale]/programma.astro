@@ -1,0 +1,135 @@
+---
+import type { GetStaticPaths } from "astro"
+import MainLayout from "../../layouts/main.astro"
+import FixtureRow from "../../components/FixtureRow.astro"
+import FixtureRowSkeleton from "../../components/FixtureRowSkeleton.astro"
+import type { Match } from "../../lib/matches"
+import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+
+export const getStaticPaths = (() =>
+	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+
+const locale = resolveLocale(Astro.currentLocale)
+const t = useTranslations(locale)
+const { fixtures } = await getHomeContent(locale)
+const page = fixtures.page
+
+// Fixtures are fetched in the browser (always up to date); skeletons show while they load.
+const SKELETONS = 12
+const blankMatch: Match = {
+	id: 0, date: "", dateLabel: "", time: "", home: "", away: "", homeIsUs: true, awayIsUs: false,
+	venue: "", played: false,
+}
+const messages = { error: t("matches.error"), noFixtures: t("matches.noFixtures") }
+const pagination = { label: t("pagination.label"), prev: t("pagination.prev"), next: t("pagination.next"), page: t("pagination.page") }
+const filterLabels = { team: t("filter.team"), all: t("filter.allTeams") }
+const PAGE_SIZE = 12
+---
+<MainLayout title={page.metaTitle} description={page.metaDescription} headerVariant="page" current="fixtures">
+	<main id="main" data-live-fixtures data-locale={t("locale.bcp47")} data-messages={JSON.stringify(messages)} data-pagination={JSON.stringify(pagination)} data-page-size={PAGE_SIZE} data-all-teams={filterLabels.all} class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+			<div class="mb-12">
+				<div>
+					<h1 class="section-title mt-0 text-white">{page.pageTitle}</h1>
+					<p class="mt-5 text-sm leading-6 text-white/70">{page.pageIntro}</p>
+				</div>
+			</div>
+
+			<div data-filter hidden class="mb-6 flex items-center gap-4">
+				<label id="team-filter-label" for="team-filter" class="text-xs font-bold tracking-label text-white/55 uppercase">{filterLabels.team}</label>
+				<div data-select class="relative">
+					<button
+						type="button"
+						id="team-filter"
+						data-select-button
+						aria-haspopup="listbox"
+						aria-expanded="false"
+						class="flex min-w-56 items-center justify-between gap-6 border border-white/25 bg-navy py-3 pr-4 pl-4 text-left text-sm font-semibold text-white transition hover:border-gold aria-expanded:border-gold"
+					>
+						<span data-select-label class="truncate">{filterLabels.all}</span>
+						<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-gold transition-transform in-aria-expanded:rotate-180">
+							<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+					</button>
+					<ul
+						data-select-list
+						role="listbox"
+						tabindex="-1"
+						hidden
+						aria-labelledby="team-filter-label"
+						class="absolute top-full left-0 z-10 mt-1 max-h-72 min-w-full overflow-auto border border-white/25 bg-navy shadow-card focus:outline-none"
+					></ul>
+				</div>
+			</div>
+
+			<ul data-fixture-list class="grid gap-4">
+				{Array.from({ length: SKELETONS }, () => <FixtureRowSkeleton />)}
+			</ul>
+			<p data-fixtures-status role="status" class="sr-only text-sm text-white/70">{t("matches.loading")}</p>
+			<nav data-pagination hidden aria-label={pagination.label} class="mt-10 flex flex-wrap items-center gap-2"></nav>
+			<template data-fixture-template><FixtureRow fixture={blankMatch} /></template>
+		</div>
+	</main>
+</MainLayout>
+
+<script>
+	import { fetchMatches, ourTeam, selectSchedule, type Match } from "../../lib/matches"
+	import { renderFixture } from "../../lib/render-fixture"
+	import { createSelect, renderPagination, syncUrl, type PaginationLabels } from "../../lib/list-controls"
+
+	const root = document.querySelector<HTMLElement>("[data-live-fixtures]")!
+	const messages: Record<"error" | "noFixtures", string> = JSON.parse(root.dataset.messages!)
+	const locale = root.dataset.locale
+	const fixtureTemplate = root.querySelector<HTMLTemplateElement>("[data-fixture-template]")!
+	const list = root.querySelector<HTMLElement>("[data-fixture-list]")!
+	const status = root.querySelector<HTMLElement>("[data-fixtures-status]")!
+
+	const pagination: PaginationLabels = JSON.parse(root.dataset.pagination!)
+	const pageSize = Number(root.dataset.pageSize)
+	const nav = root.querySelector<HTMLElement>("nav[data-pagination]")!
+	const filter = root.querySelector<HTMLElement>("[data-filter]")!
+	const allTeamsLabel = root.dataset.allTeams!
+
+	/** Swaps the skeletons for content, or for a visible message when there is none. */
+	function show(items: HTMLElement[], emptyMessage: string) {
+		list.replaceChildren(...items)
+		list.hidden = items.length === 0
+		status.textContent = items.length === 0 ? emptyMessage : ""
+		status.classList.toggle("sr-only", items.length > 0)
+	}
+
+	const params = new URLSearchParams(location.search)
+
+	function init(all: Match[]) {
+		const teams = [...new Set(all.map(ourTeam))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+		filter.hidden = teams.length < 2
+
+		let team = teams.includes(params.get("team") ?? "") ? params.get("team")! : ""
+
+		function render(page: number, moved: boolean) {
+			const fixtures = team ? all.filter((match) => ourTeam(match) === team) : all
+			const pages = Math.max(1, Math.ceil(fixtures.length / pageSize))
+			page = Math.min(Math.max(1, page), pages)
+			const slice = fixtures.slice((page - 1) * pageSize, page * pageSize)
+			show(slice.map((match) => renderFixture(fixtureTemplate, match)), messages.noFixtures)
+			renderPagination(nav, pagination, page, pages, (next) => render(next, true))
+			syncUrl(page, team)
+			if (moved) root.scrollIntoView({ behavior: "smooth", block: "start" })
+		}
+
+		createSelect(filter, [{ value: "", label: allTeamsLabel }, ...teams.map((name) => ({ value: name, label: name }))], team, (value) => {
+			team = value
+			render(1, false)
+		})
+		render(Number(params.get("page")) || 1, false)
+	}
+
+	fetchMatches(locale)
+		.then((matches) => {
+			init(selectSchedule(matches))
+		})
+		.catch((error) => {
+			console.warn("Could not load fixtures", error)
+			show([], messages.error)
+		})
+</script>
