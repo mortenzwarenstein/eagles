@@ -35,7 +35,7 @@ const plans = await fetchPlans()
 // Rows per date block in the fixtures skeleton (adds up to FIXTURES_LIMIT).
 const fixtureSkeletons = [2, 1, 2]
 
-// Empty instances used as <template>s by the client-side renderer.
+// Empty instances used as <template> by the client-side renderer.
 const blankMatch: Match = {
 	id: 0, date: "", dateLabel: "", time: "", home: "", away: "", homeIsUs: true, awayIsUs: false,
 	venue: "", played: true, homeScore: 0, awayScore: 0, outcome: "win",
@@ -80,7 +80,7 @@ const lines = (text: string) => text.split("\n")
 						<p class="section-kicker text-gold">{content.results.kicker}</p>
 						<h2 class="section-title text-white">{content.results.title}</h2>
 					</div>
-					<a href="#results" class="link-arrow text-white hover:text-white">{content.results.linkLabel} <ArrowUpRight /></a>
+					<a href={getRelativeLocaleUrl(locale, "uitslagen")} class="link-arrow text-white hover:text-white">{content.results.linkLabel} <ArrowUpRight /></a>
 				</div>
 				<Carousel label={content.results.title} prevLabel={t("carousel.prev")} nextLabel={t("carousel.next")}>
 					{Array.from({ length: RESULTS_LIMIT }, () => (
@@ -181,7 +181,8 @@ const lines = (text: string) => text.split("\n")
 </MainLayout>
 
 <script>
-	import { fetchMatches, groupByDay, initials, OUTCOME_CLASSES, selectResults, selectSchedule, shortenName, type FixtureDay, type Match } from "../../lib/matches"
+	import { fetchMatches, groupByDay, selectResults, selectSchedule, shortenName, type FixtureDay, type Match } from "../../lib/matches"
+	import { renderResult as renderResultFromTemplate } from "../../lib/render-result"
 
 	const root = document.querySelector<HTMLElement>("[data-live-matches]")!
 	const { locale, resultsLimit, fixturesLimit } = root.dataset
@@ -189,40 +190,13 @@ const lines = (text: string) => text.split("\n")
 
 	const resultTemplate = root.querySelector<HTMLTemplateElement>("[data-result-template]")!
 	const outcomeLabels: Record<string, string> = JSON.parse(resultTemplate.dataset.outcomeLabels!)
-	const allOutcomeClasses = Object.values(OUTCOME_CLASSES).flatMap((c) => c.split(" "))
 	const groupTemplate = root.querySelector<HTMLTemplateElement>("[data-fixture-group-template]")!
 	const fixtureTemplate = root.querySelector<HTMLTemplateElement>("[data-fixture-template]")!
 
 	const clone = (template: HTMLTemplateElement) => template.content.firstElementChild!.cloneNode(true) as HTMLElement
 	const $ = (el: ParentNode, selector: string) => el.querySelector<HTMLElement>(selector)!
 
-	function renderResult(match: Match) {
-		const slide = clone(resultTemplate)
-		$(slide, "[data-date]").textContent = match.dateLabel
-		const teams = [
-			{ name: match.home, score: match.homeScore, isUs: match.homeIsUs },
-			{ name: match.away, score: match.awayScore, isUs: match.awayIsUs },
-		]
-		slide.querySelectorAll<HTMLElement>("[data-team]").forEach((row, i) => {
-			const team = teams[i]
-			$(row, "[data-logo]").hidden = !team.isUs
-			const badge = $(row, "[data-initials]")
-			badge.hidden = team.isUs
-			badge.textContent = initials(team.name)
-			const name = $(row, "[data-name]")
-			name.textContent = shortenName(team.name)
-			name.title = team.name
-			name.classList.toggle("text-white/75", !team.isUs)
-			const score = $(row, "[data-score]")
-			score.textContent = String(team.score)
-			score.classList.toggle("text-white/65", !team.isUs)
-		})
-		const outcome = $(slide, "[data-outcome]")
-		outcome.classList.remove(...allOutcomeClasses)
-		outcome.classList.add(...OUTCOME_CLASSES[match.outcome!].split(" "))
-		outcome.textContent = outcomeLabels[match.outcome!]
-		return slide
-	}
+	const renderResult = (match: Match) => renderResultFromTemplate(resultTemplate, outcomeLabels, match)
 
 	function renderFixtureDay(day: FixtureDay) {
 		const group = clone(groupTemplate)

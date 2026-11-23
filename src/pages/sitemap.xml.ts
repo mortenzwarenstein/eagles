@@ -6,6 +6,7 @@ import type { APIRoute } from "astro"
  */
 const PAGES: [nl: string, en: string][] = [
 	["/", "/en/"],
+	["/uitslagen/", "/en/uitslagen/"],
 	["/inschrijven/", "/en/inschrijven/"],
 ]
 

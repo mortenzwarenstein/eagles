@@ -16,7 +16,8 @@
 	"results": {
 		"kicker": "Final score",
 		"title": "Latest results",
-		"linkLabel": "All results"
+		"linkLabel": "All results",
+		"page": {"pageTitle": "Results", "pageIntro": "How did we do? All results of this season, right here.", "metaTitle": "Results | UBV The Eagles", "metaDescription": "All UBV The Eagles results of the current season."}
 	},
 	"fixtures": {
 		"kicker": "Coming up",

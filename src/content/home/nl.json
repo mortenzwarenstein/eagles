@@ -16,7 +16,8 @@
 	"results": {
 		"kicker": "Eindstand",
 		"title": "Laatste uitslagen",
-		"linkLabel": "Alle uitslagen"
+		"linkLabel": "Alle uitslagen",
+		"page": {"pageTitle": "Uitslagen", "pageIntro": "Hoe deden we het? Hier staan alle uitslagen van dit seizoen.", "metaTitle": "Uitslagen | UBV The Eagles", "metaDescription": "Alle uitslagen van UBV The Eagles in het huidige seizoen."}
 	},
 	"fixtures": {
 		"kicker": "Binnenkort",
