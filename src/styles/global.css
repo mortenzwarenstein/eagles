@@ -1,5 +1,5 @@
 /* Utrecht Eagles — Tailwind CSS v4 theme */
-@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900&family=DM+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -14,8 +14,9 @@
     --color-paper-dim: #EAE6DC;
     --color-slate: #3A4B5C;
 
-    --font-display: "Big Shoulders Display", Impact, sans-serif;
-    --font-sans: "Barlow", system-ui, sans-serif;
+    --font-display: "Barlow Condensed", Impact, sans-serif;
+    --font-sans: "DM Sans", system-ui, sans-serif;
+    --font-score: var(--font-display);
 
     --tracking-label: 0.14em;
     --tracking-eyebrow: 0.32em;
@@ -31,8 +32,12 @@
 
 @layer base {
     html { scroll-behavior: smooth; }
-    body { @apply bg-paper text-navy font-sans antialiased; }
+    body { @apply bg-paper text-navy font-sans; }
     a { @apply text-navy no-underline hover:text-gold-dark; }
+    button, a, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { @apply cursor-pointer; }
+    ::selection { @apply bg-gold text-navy; }
 }
 
 /* Reusable patterns from the design */
@@ -91,4 +96,15 @@
 }
 @utility clip-photo-notch {
     clip-path: polygon(0 0, 100% 0, 100% 88%, 86% 100%, 0 100%);
+}
+
+/* Section patterns (ported from eagles-2-astro) */
+@utility section-kicker {
+    @apply text-[0.6875rem] font-extrabold leading-none tracking-[0.18em] uppercase;
+}
+@utility section-title {
+    @apply mt-3 font-display text-[clamp(3.5rem,7vw,6.5rem)] font-black leading-[0.85] tracking-[-0.04em] uppercase;
+}
+@utility link-arrow {
+    @apply inline-flex w-fit items-center gap-[0.65rem] border-b border-current pb-[0.35rem] text-[0.6875rem] font-extrabold tracking-label uppercase transition-[gap] duration-200 hover:gap-[0.9rem];
 }

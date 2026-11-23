@@ -1,0 +1,93 @@
+---
+import type { GetStaticPaths } from "astro"
+import MainLayout from "../../layouts/main.astro"
+import ArrowRight from "../../components/icons/ArrowRight.astro"
+import ArrowUpRight from "../../components/icons/ArrowUpRight.astro"
+import FixtureCard from "../../components/FixtureCard.astro"
+import Carousel from "../../components/Carousel.astro"
+import ResultCard from "../../components/ResultCard.astro"
+import { fetchResults, fetchSchedule } from "../../lib/matches"
+import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+
+// The default locale lives at "/", others at "/<locale>/".
+export const getStaticPaths = (() =>
+	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+
+const locale = resolveLocale(Astro.currentLocale)
+const t = useTranslations(locale)
+const content = await getHomeContent(locale)
+
+const [results, schedule] = await Promise.all([fetchResults(6, t("locale.bcp47")), fetchSchedule(5)])
+
+const monthFormat = new Intl.DateTimeFormat(t("locale.bcp47"), { month: "short", timeZone: "UTC" })
+const fixtures = schedule.map((match) => ({
+	day: match.date.slice(8, 10),
+	month: monthFormat.format(new Date(match.date + "Z")).replace(".", "").toUpperCase(),
+	time: match.time,
+	home: match.home,
+	away: match.away,
+	venue: match.venue,
+}))
+
+const lines = (text: string) => text.split("\n")
+---
+<MainLayout title={content.meta.title} description={content.meta.description}>
+	<main id="top">
+		<section class="relative flex min-h-[720px] items-end overflow-hidden bg-navy text-white">
+			<div class="relative mx-auto w-full max-w-[1400px] px-5 pt-36 pb-16 sm:px-8 lg:px-12 lg:pb-20">
+				<div class="max-w-4xl">
+					<p class="mb-5 flex items-center gap-3 text-xs font-extrabold tracking-[0.2em] text-gold uppercase">
+						<span class="h-px w-9 bg-gold"></span> {content.hero.kicker}
+					</p>
+					<h1 class="w-full max-w-[850px] font-display text-[clamp(3.4rem,10vw,9rem)] leading-[0.78] font-extrabold tracking-[-0.045em] uppercase">
+						{content.hero.title}<br /><span class="whitespace-nowrap text-gold">{content.hero.titleHighlight}</span>
+					</h1>
+					<div class="mt-8 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+						<a
+							href={content.hero.cta.href}
+							class="flex items-center gap-3 bg-gold px-6 py-4 text-xs font-extrabold tracking-label text-navy uppercase transition hover:bg-white"
+						>
+							{content.hero.cta.label} <ArrowRight />
+						</a>
+						<p class="max-w-xs text-sm leading-6 text-white/70">{content.hero.intro}</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="results" class="bg-navy py-16 text-white sm:py-20">
+			<div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+				<div class="mb-9 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+					<div>
+						<p class="section-kicker text-gold">{content.results.kicker}</p>
+						<h2 class="section-title text-white">{content.results.title}</h2>
+					</div>
+					<a href="#results" class="link-arrow text-white hover:text-white">{content.results.linkLabel} <ArrowUpRight /></a>
+				</div>
+				<Carousel prevLabel={t("carousel.prev")} nextLabel={t("carousel.next")}>
+					{results.map((result) => (
+						<li class="shrink-0 snap-start basis-full sm:basis-[calc((100%-1rem)/2)] lg:basis-[calc((100%-2rem)/3)]">
+							<ResultCard result={result} locale={locale} />
+						</li>
+					))}
+				</Carousel>
+			</div>
+		</section>
+
+		<section id="fixtures" class="py-20 sm:py-28">
+			<div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
+				<div>
+					<p class="section-kicker">{content.fixtures.kicker}</p>
+					<h2 class="section-title">
+						{lines(content.fixtures.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+					</h2>
+					<p class="mt-5 max-w-sm text-sm leading-6 text-navy/60">{content.fixtures.intro}</p>
+					<a href="#fixtures" class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
+				</div>
+				<div class="border-t border-navy/20">
+					{fixtures.map((fixture) => <FixtureCard fixture={fixture} />)}
+				</div>
+			</div>
+		</section>
+	</main>
+</MainLayout>

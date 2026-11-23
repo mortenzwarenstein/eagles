@@ -1,0 +1,20 @@
+{
+	"meta": {
+		"title": "UBV The Eagles | Basketbal in Utrecht",
+		"description": "UBV The Eagles is een van de oudste, kleinste en gezelligste basketbalverenigingen van Utrecht."
+	},
+	"hero": {
+		"kicker": "Een gezellige basketbalclub voor iedereen",
+		"title": "Samen spelen.",
+		"titleHighlight": "Samen groeien.",
+		"cta": { "label": "Ontdek onze club", "href": "#fixtures" },
+		"intro": "Basketbal in Utrecht doe je bij UBV The Eagles, één van de oudste, kleinste en gezelligste basketballverenigingen van Utrecht! Kijk rond voor alle clubinfo."
+	},
+	"results": { "kicker": "Eindstand", "title": "Laatste uitslagen", "linkLabel": "Alle uitslagen" },
+	"fixtures": {
+		"kicker": "Binnenkort",
+		"title": "Volgende\nwedstrijden",
+		"intro": "Kom gezellig kijken en moedig Heren 1, 2, 3 en 4 aan bij hun volgende wedstrijd.",
+		"linkLabel": "Volledig programma"
+	}
+}

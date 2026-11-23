@@ -1,0 +1,20 @@
+{
+	"meta": {
+		"title": "UBV The Eagles | Basketball in Utrecht",
+		"description": "UBV The Eagles is one of the oldest, smallest and friendliest basketball clubs in Utrecht."
+	},
+	"hero": {
+		"kicker": "A friendly basketball club for everyone",
+		"title": "Play together.",
+		"titleHighlight": "Grow together.",
+		"cta": { "label": "Discover our club", "href": "#fixtures" },
+		"intro": "Basketball in Utrecht means UBV The Eagles, one of the oldest, smallest and friendliest basketball clubs in the city! Take a look around for all club info."
+	},
+	"results": { "kicker": "Final score", "title": "Latest results", "linkLabel": "All results" },
+	"fixtures": {
+		"kicker": "Coming up",
+		"title": "Next\nmatches",
+		"intro": "Come along and cheer on Men's 1, 2, 3 and 4 at their next game.",
+		"linkLabel": "Full schedule"
+	}
+}
