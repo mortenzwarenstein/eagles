@@ -21,9 +21,7 @@ const navItems = [
     { label: t("nav.home"), href: homeUrl, current: current === "home" },
     { label: t("nav.results"), href: getRelativeLocaleUrl(locale, "uitslagen"), current: current === "results" },
     { label: t("nav.fixtures"), href: getRelativeLocaleUrl(locale, "programma"), current: current === "fixtures" },
-    current === "join"
-        ? { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: true }
-        : { label: t("nav.join"), href: `${prefix}#join`, current: false },
+    { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: current === "join" },
     { label: t("nav.contact"), href: `${prefix}#contact`, current: false },
 ]
 const otherLocales = locales
