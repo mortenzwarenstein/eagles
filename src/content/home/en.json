@@ -60,5 +60,32 @@
 		},
 		"cta": "Go to the sign-up form",
 		"teaser": "Want to play basketball with The Eagles? Sign up as a member and join in, or just come and train with us."
+	},
+	"contact": {
+		"kicker": "Contact",
+		"title": "Get in\ntouch",
+		"intro": "Questions about membership, training or games? Send us a letter or drop by at a home game.",
+		"postal": {
+			"title": "Postal address",
+			"lines": [
+				"Rachid Kolfin (secretary)",
+				"Kamperfoeliestraat 6",
+				"3732 VT De Bilt"
+			]
+		},
+		"venue": {
+			"title": "Home games",
+			"text": "The Eagles play their home games at Sportcentrum De Galgenwaard.",
+			"lines": [
+				"Sportcentrum De Galgenwaard",
+				"Herculesplein 341",
+				"3584 AA Utrecht"
+			],
+			"mapQuery": "Sportcentrum De Galgenwaard, Herculesplein 341, 3584 AA Utrecht",
+			"mapTitle": "Map showing the location of Sportcentrum De Galgenwaard",
+			"mapLinkLabel": "Navigate",
+			"lon": 5.14473233,
+			"lat": 52.07786772
+		}
 	}
 }

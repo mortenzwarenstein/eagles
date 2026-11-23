@@ -10,6 +10,7 @@ import FixtureGroup from "../../components/FixtureGroup.astro"
 import Carousel from "../../components/Carousel.astro"
 import ResultCard from "../../components/ResultCard.astro"
 import { fetchPlans, formatPrice } from "../../lib/registration"
+import VenueMap from "../../components/VenueMap.astro"
 import FixtureCard from "../../components/FixtureCard.astro"
 import ResultCardSkeleton from "../../components/ResultCardSkeleton.astro"
 import FixtureGroupSkeleton from "../../components/FixtureGroupSkeleton.astro"
@@ -138,6 +139,41 @@ const lines = (text: string) => text.split("\n")
 					>
 						{content.join.cta} <ArrowRight />
 					</a>
+				</div>
+			</div>
+		</section>
+
+		<section id="contact" class="py-20 sm:py-28">
+			<div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
+				<div>
+					<p class="section-kicker">{content.contact.kicker}</p>
+					<h2 class="section-title">
+						{lines(content.contact.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+					</h2>
+					<p class="mt-5 max-w-sm text-sm leading-6 text-navy/75">{content.contact.intro}</p>
+				</div>
+				<div class="max-w-3xl">
+					<div class="grid gap-8 border-t border-navy/20 pt-6 sm:grid-cols-2">
+						<div>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/60 uppercase">{content.contact.postal.title}</h3>
+							<address class="text-sm leading-6 not-italic">
+								{content.contact.postal.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+							</address>
+						</div>
+						<div>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/60 uppercase">{content.contact.venue.title}</h3>
+							<address class="text-sm leading-6 not-italic">
+								{content.contact.venue.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+							</address>
+						</div>
+					</div>
+					<VenueMap lon={content.contact.venue.lon} lat={content.contact.venue.lat} label={content.contact.venue.mapTitle} class="mt-8" />
+					<a
+						href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.contact.venue.mapQuery)}`}
+						target="_blank"
+						rel="noopener"
+						class="link-arrow mt-5"
+					>{content.contact.venue.mapLinkLabel} <ArrowUpRight /></a>
 				</div>
 			</div>
 		</section>
