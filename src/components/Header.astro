@@ -1,5 +1,6 @@
 ---
 import Logo from "../assets/images/eag_logo.png"
+import { Image } from "astro:assets"
 
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { locales, localizedPathname, useTranslations, type Locale } from "../i18n"
@@ -36,7 +37,7 @@ const otherLocales = locales
     <div class="mx-auto flex h-20 max-w-350 items-center justify-between px-5 sm:px-8 lg:px-12">
         <a href={isHome ? "#main" : homeUrl} class="flex items-center gap-3" aria-label={t("header.homeLabel")}>
             <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-white p-2">
-                <img src={Logo.src} alt={t("header.logoAlt")} class="size-full object-contain" />
+                <Image src={Logo} width={112} alt={t("header.logoAlt")} class="size-full object-contain" />
             </span>
             <span class="font-display text-xl leading-none font-bold tracking-[0.06em] text-gold uppercase">
                 UBV<br />The Eagles

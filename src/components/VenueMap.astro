@@ -21,57 +21,22 @@ const { lon, lat, label, class: className } = Astro.props
 ></div>
 
 <script>
-	import "ol/ol.css"
-	import Map from "ol/Map"
-	import View from "ol/View"
-	import Feature from "ol/Feature"
-	import Point from "ol/geom/Point"
-	import TileLayer from "ol/layer/Tile"
-	import VectorLayer from "ol/layer/Vector"
-	import VectorSource from "ol/source/Vector"
-	import XYZ from "ol/source/XYZ"
-	import { defaults as defaultInteractions } from "ol/interaction/defaults"
-	import { fromLonLat } from "ol/proj"
-	import { Icon, Style } from "ol/style"
-
-	// PDOK BRT Achtergrondkaart (Kadaster), served as XYZ tiles in Web Mercator.
-	const PDOK_TILES = "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png"
-
-	// Classic teardrop pin in the brand colors; the tip (bottom centre) sits on the coordinate.
-	const pinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48"><path d="M18 2C9.2 2 2 9 2 17.6 2 29.5 18 46 18 46s16-16.5 16-28.4C34 9 26.8 2 18 2z" fill="#F4B223" stroke="#0A1F33" stroke-width="3" stroke-linejoin="round"/><circle cx="18" cy="17.5" r="6" fill="#0A1F33"/></svg>`
-
-	const marker = new Style({
-		image: new Icon({
-			src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(pinSvg)}`,
-			width: 36,
-			height: 48,
-			anchor: [0.5, 1],
-		}),
-	})
-
-	document.querySelectorAll<HTMLElement>("[data-venue-map]").forEach((el) => {
-		const center = fromLonLat([Number(el.dataset.lon), Number(el.dataset.lat)])
-		const map = new Map({
-			target: el,
-			// Pan and zoom only after the map is focused/clicked, so it doesn't hijack page scrolling.
-			interactions: defaultInteractions({ onFocusOnly: true }),
-			layers: [
-				new TileLayer({
-					source: new XYZ({
-						url: PDOK_TILES,
-						maxZoom: 19,
-						attributions: '© <a href="https://www.kadaster.nl" target="_blank" rel="noopener">Kadaster</a>',
-					}),
-				}),
-				new VectorLayer({
-					source: new VectorSource({ features: [new Feature(new Point(center))] }),
-					style: marker,
-				}),
-			],
-			view: new View({ center, zoom: 16 }),
-		})
-		// Make sure the size is measured once layout and styles have settled.
-		requestAnimationFrame(() => map.updateSize())
-		window.addEventListener("load", () => map.updateSize())
-	})
+	// OpenLayers is large: only download it once a map is about to scroll into view.
+	const load = (el: HTMLElement) => import("../lib/venue-map").then((m) => m.initVenueMap(el))
+	const maps = document.querySelectorAll<HTMLElement>("[data-venue-map]")
+	if ("IntersectionObserver" in window) {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue
+					observer.unobserve(entry.target)
+					load(entry.target as HTMLElement)
+				}
+			},
+			{ rootMargin: "300px" },
+		)
+		maps.forEach((el) => observer.observe(el))
+	} else {
+		maps.forEach(load)
+	}
 </script>

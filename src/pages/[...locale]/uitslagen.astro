@@ -80,7 +80,7 @@ const PAGE_SIZE = 12
 <script>
 	import { fetchMatches, ourTeam, selectResults, type Match } from "../../lib/matches"
 	import { renderResult } from "../../lib/render-result"
-	import { createSelect, renderPagination, syncUrl, type PaginationLabels } from "../../lib/list-controls"
+	import { createSelect, renderPagination, scrollToTop, syncUrl, type PaginationLabels } from "../../lib/list-controls"
 
 	const root = document.querySelector<HTMLElement>("[data-live-results]")!
 	const messages: Record<"error" | "noResults", string> = JSON.parse(root.dataset.messages!)
@@ -119,7 +119,7 @@ const PAGE_SIZE = 12
 			show(slice.map((match) => renderResult(template, outcomeLabels, match)), messages.noResults)
 			renderPagination(nav, pagination, page, pages, (next) => render(next, true))
 			syncUrl(page, team)
-			if (moved) root.scrollIntoView({ behavior: "smooth", block: "start" })
+			if (moved) scrollToTop(root)
 		}
 
 		createSelect(filter, [{ value: "", label: allTeamsLabel }, ...teams.map((name) => ({ value: name, label: name }))], team, (value) => {

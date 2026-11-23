@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css"
 import { getImage } from "astro:assets"
+import { Font } from "astro:assets"
 import ogSource from "../assets/images/team-heren-1.jpg"
 import logo from "../assets/images/eag_logo.png"
 
@@ -48,11 +49,13 @@ const analyticsId = import.meta.env.PUBLIC_GA_ID
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Font cssVariable="--font-barlow-condensed" preload={[{ weight: 800, style: "normal" }]} />
+    <Font cssVariable="--font-dm-sans" preload={[{ weight: 400, style: "normal" }]} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     {!noindex && locales.map((l) => <link rel="alternate" hreflang={l} href={alternateUrl(l)} />)}
     {!noindex && <link rel="alternate" hreflang="x-default" href={alternateUrl(defaultLocale)} />}
@@ -68,10 +71,12 @@ const analyticsId = import.meta.env.PUBLIC_GA_ID
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t("og.imageAlt")} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
     <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={t("og.imageAlt")} />
     {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     {analyticsId && (
         <>

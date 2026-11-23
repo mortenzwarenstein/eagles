@@ -15,7 +15,7 @@ const plans = await fetchPlans()
 
 const lines = (text: string) => text.split("\n")
 ---
-<MainLayout title={`${content.join.kicker} | UBV The Eagles`} description={content.join.intro} headerVariant="page" current="join">
+<MainLayout title={`${content.join.title.replaceAll("\n", " ")} | UBV The Eagles`} description={content.join.intro} headerVariant="page" current="join">
 	<main id="main" class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
 		<div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
 			<div>
