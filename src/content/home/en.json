@@ -17,14 +17,24 @@
 		"kicker": "Final score",
 		"title": "Latest results",
 		"linkLabel": "All results",
-		"page": {"pageTitle": "Results", "pageIntro": "How did we do? All results of this season, right here.", "metaTitle": "Results | UBV The Eagles", "metaDescription": "All UBV The Eagles results of the current season."}
+		"page": {
+			"pageTitle": "Results",
+			"pageIntro": "How did we do? All results of this season, right here.",
+			"metaTitle": "Results | UBV The Eagles",
+			"metaDescription": "All UBV The Eagles results of the current season."
+		}
 	},
 	"fixtures": {
 		"kicker": "Coming up",
 		"title": "Next\nmatches",
-		"intro": "Come along and cheer on Men's 1, 2, 3 and 4 at their next game.",
+		"intro": "Come along and cheer on Men's 1, 2 and 3 at their next game.",
 		"linkLabel": "Full programme",
-		"page": {"pageTitle": "Schedule", "pageIntro": "When do we play? All upcoming matches of this season, right here.", "metaTitle": "Schedule | UBV The Eagles", "metaDescription": "All upcoming UBV The Eagles matches of the current season."}
+		"page": {
+			"pageTitle": "Schedule",
+			"pageIntro": "When do we play? All upcoming matches of this season, right here.",
+			"metaTitle": "Schedule | UBV The Eagles",
+			"metaDescription": "All upcoming UBV The Eagles matches of the current season."
+		}
 	},
 	"join": {
 		"kicker": "Join",
@@ -88,6 +98,51 @@
 			"mapLinkLabel": "Navigate",
 			"lon": 5.14473233,
 			"lat": 52.07786772
+		},
+		"page": {
+			"pageTitle": "Contact",
+			"pageIntro": "Questions about membership, training or games? Get in touch using the details below.",
+			"metaTitle": "Contact | UBV The Eagles",
+			"metaDescription": "Contact details, postal address, venue and the board of UBV The Eagles."
+		},
+		"board": {
+			"title": "Board",
+			"intro": "The board of UBV The Eagles consists of the following people:",
+			"lastMinute": "For last-minute game matters, please contact Dennis Liersen or Wouter Kitsz.",
+			"phoneLabel": "Phone",
+			"emailLabel": "Email",
+			"members": [
+				{
+					"role": "Chair",
+					"name": "Wieger Eekma",
+					"phone": "06-47478892",
+					"email": "voorzitter@utrechteagles.nl"
+				},
+				{
+					"role": "Secretary",
+					"name": "Rachid Kolfin",
+					"phone": "06-19598847",
+					"email": "secretaris@utrechteagles.nl"
+				},
+				{
+					"role": "Treasurer",
+					"name": "Sander vd Horst",
+					"phone": "",
+					"email": "knip@utrechteagles.nl"
+				},
+				{
+					"role": "Match secretary",
+					"name": "Dennis Liersen",
+					"phone": "06-15436462",
+					"email": "wedsec@utrechteagles.nl"
+				},
+				{
+					"role": "Referees",
+					"name": "Wouter Kitsz",
+					"phone": "06-83910511",
+					"email": "scheids@utrechteagles.nl"
+				}
+			]
 		}
 	}
 }
