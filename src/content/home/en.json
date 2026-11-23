@@ -8,7 +8,7 @@
 		"title": "Basketball in",
 		"titleHighlight": "Utrecht.",
 		"cta": {
-			"label": "See the fixtures",
+			"label": "View the programme",
 			"href": "#fixtures"
 		},
 		"intro": "One of the oldest, smallest and friendliest basketball clubs in Utrecht. Come and watch a game, or just join in."
@@ -22,7 +22,7 @@
 		"kicker": "Coming up",
 		"title": "Next\nmatches",
 		"intro": "Come along and cheer on Men's 1, 2, 3 and 4 at their next game.",
-		"linkLabel": "Full schedule"
+		"linkLabel": "Full programme"
 	},
 	"join": {
 		"kicker": "Join",
