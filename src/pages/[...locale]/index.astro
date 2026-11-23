@@ -3,7 +3,7 @@ import type { GetStaticPaths } from "astro"
 import MainLayout from "../../layouts/main.astro"
 import ArrowRight from "../../components/icons/ArrowRight.astro"
 import ArrowUpRight from "../../components/icons/ArrowUpRight.astro"
-import FixtureCard from "../../components/FixtureCard.astro"
+import FixtureGroup from "../../components/FixtureGroup.astro"
 import Carousel from "../../components/Carousel.astro"
 import ResultCard from "../../components/ResultCard.astro"
 import { fetchResults, fetchSchedule } from "../../lib/matches"
@@ -20,13 +20,13 @@ const content = await getHomeContent(locale)
 const [results, schedule] = await Promise.all([fetchResults(6, t("locale.bcp47")), fetchSchedule(5)])
 
 const monthFormat = new Intl.DateTimeFormat(t("locale.bcp47"), { month: "short", timeZone: "UTC" })
-const fixtures = schedule.map((match) => ({
-	day: match.date.slice(8, 10),
-	month: monthFormat.format(new Date(match.date + "Z")).replace(".", "").toUpperCase(),
-	time: match.time,
-	home: match.home,
-	away: match.away,
-	venue: match.venue,
+
+// Matches on the same day share one date block.
+const fixtureGroups = Object.entries(Object.groupBy(schedule, (match) => match.date.slice(0, 10))).map(([date, matches]) => ({
+	date,
+	day: date.slice(8, 10),
+	month: monthFormat.format(new Date(`${date}T00:00:00Z`)).replace(".", ""),
+	fixtures: matches!.map(({ time, home, away, venue }) => ({ time, home, away, venue })),
 }))
 
 const lines = (text: string) => text.split("\n")
@@ -85,7 +85,7 @@ const lines = (text: string) => text.split("\n")
 					<a href="#fixtures" class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
 				</div>
 				<div class="border-t border-navy/20">
-					{fixtures.map((fixture) => <FixtureCard fixture={fixture} />)}
+					{fixtureGroups.map((group) => <FixtureGroup {...group} />)}
 				</div>
 			</div>
 		</section>

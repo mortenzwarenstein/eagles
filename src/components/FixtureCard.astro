@@ -2,8 +2,6 @@
 import { shortenName } from "../lib/matches"
 
 export interface Fixture {
-	day: string
-	month: string
 	time: string
 	home: string
 	away: string
@@ -19,11 +17,8 @@ const { fixture } = Astro.props
 // One line per team; names that still don't fit are shortened (keeping the team number).
 const teams = [fixture.home, fixture.away].map((name) => ({ name, short: shortenName(name, 28) }))
 ---
-<article class="grid grid-cols-[58px_1fr_auto] items-center gap-4 border-b border-navy/20 py-6 sm:grid-cols-[70px_1fr_1fr_auto] sm:gap-7">
-	<div class="border-r border-navy/15">
-		<span class="block font-score text-4xl leading-none">{fixture.day}</span>
-		<span class="text-[10px] font-extrabold tracking-[0.16em] text-navy/50">{fixture.month}</span>
-	</div>
+<article class="grid grid-cols-[3.25rem_1fr] items-center gap-x-4 py-4 pr-4 pl-4 first:pt-0 last:pb-0 sm:grid-cols-[3.25rem_minmax(0,1.8fr)_minmax(0,1fr)] sm:gap-x-7 sm:pr-5">
+	<span class="font-score text-2xl leading-none font-bold">{fixture.time}</span>
 	<div class="min-w-0">
 		{teams.map((team, i) => (
 			<p
@@ -34,10 +29,5 @@ const teams = [fixture.home, fixture.away].map((name) => ({ name, short: shorten
 			</p>
 		))}
 	</div>
-	<div class="hidden sm:block">
-		<p class="text-xs text-navy/50">{fixture.venue}</p>
-	</div>
-	<div class="text-right">
-		<span class="font-score text-xl">{fixture.time}</span>
-	</div>
+	<p class="hidden text-xs text-navy/50 sm:block">{fixture.venue}</p>
 </article>
