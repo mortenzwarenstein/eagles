@@ -1,0 +1,19 @@
+---
+// Loading placeholder with the same dimensions as FixtureRow, so nothing shifts once data arrives.
+const bar = "inline-block rounded-sm bg-white/10 align-middle"
+---
+<li aria-hidden="true" class="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 border border-white/15 bg-white/6 p-5 sm:grid-cols-[9rem_1fr_minmax(0,14rem)] sm:gap-x-8 motion-safe:animate-pulse">
+	<div class="flex flex-col gap-1.5">
+		<span class="text-xs leading-4"><span class:list={[bar, "h-3 w-14"]}></span></span>
+		<span class="font-score text-2xl leading-none"><span class:list={[bar, "h-[0.8em] w-12"]}></span></span>
+	</div>
+	<div class="min-w-0 space-y-2">
+		{[0, 1].map(() => (
+			<div class="flex items-center gap-3">
+				<span class="size-6 shrink-0 rounded-full bg-white/10"></span>
+				<span class:list={[bar, "h-4 w-1/2"]}></span>
+			</div>
+		))}
+	</div>
+	<p class="col-span-2 mt-3 text-xs sm:col-span-1 sm:mt-0"><span class:list={[bar, "h-3 w-2/3"]}></span></p>
+</li>

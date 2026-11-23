@@ -102,7 +102,7 @@ const lines = (text: string) => text.split("\n")
 						{lines(content.fixtures.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
 					</h2>
 					<p class="mt-5 max-w-sm text-sm leading-6 text-navy/75">{content.fixtures.intro}</p>
-					<a href="#fixtures" class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
+					<a href={getRelativeLocaleUrl(locale, "programma")} class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
 				</div>
 				<div class="border-t border-navy/20">
 					<div data-fixture-groups>
