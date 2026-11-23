@@ -7,7 +7,7 @@ import { locales, localizedPathname, useTranslations, type Locale } from "../i18
 interface Props {
     variant?: "home" | "page"
     /** Nav item that represents the current page */
-    current?: "home" | "results" | "fixtures" | "join"
+    current?: "home" | "results" | "fixtures" | "join" | "contact"
     locale: Locale
 }
 
@@ -24,7 +24,7 @@ const navItems = [
     current === "join"
         ? { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: true }
         : { label: t("nav.join"), href: `${prefix}#join`, current: false },
-    { label: t("nav.contact"), href: `${prefix}#contact`, current: false },
+    { label: t("nav.contact"), href: getRelativeLocaleUrl(locale, "contact"), current: current === "contact" },
 ]
 const otherLocales = locales
     .filter((l) => l !== locale)

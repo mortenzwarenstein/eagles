@@ -17,14 +17,24 @@
 		"kicker": "Eindstand",
 		"title": "Laatste uitslagen",
 		"linkLabel": "Alle uitslagen",
-		"page": {"pageTitle": "Uitslagen", "pageIntro": "Hoe deden we het? Hier staan alle uitslagen van dit seizoen.", "metaTitle": "Uitslagen | UBV The Eagles", "metaDescription": "Alle uitslagen van UBV The Eagles in het huidige seizoen."}
+		"page": {
+			"pageTitle": "Uitslagen",
+			"pageIntro": "Hoe deden we het? Hier staan alle uitslagen van dit seizoen.",
+			"metaTitle": "Uitslagen | UBV The Eagles",
+			"metaDescription": "Alle uitslagen van UBV The Eagles in het huidige seizoen."
+		}
 	},
 	"fixtures": {
 		"kicker": "Binnenkort",
 		"title": "Volgende\nwedstrijden",
 		"intro": "Kom gezellig kijken en moedig Heren 1, 2, 3 en 4 aan bij hun volgende wedstrijd.",
 		"linkLabel": "Volledig programma",
-		"page": {"pageTitle": "Programma", "pageIntro": "Wanneer spelen we? Hier staan alle komende wedstrijden van dit seizoen.", "metaTitle": "Programma | UBV The Eagles", "metaDescription": "Alle komende wedstrijden van UBV The Eagles in het huidige seizoen."}
+		"page": {
+			"pageTitle": "Programma",
+			"pageIntro": "Wanneer spelen we? Hier staan alle komende wedstrijden van dit seizoen.",
+			"metaTitle": "Programma | UBV The Eagles",
+			"metaDescription": "Alle komende wedstrijden van UBV The Eagles in het huidige seizoen."
+		}
 	},
 	"join": {
 		"kicker": "Inschrijven",
@@ -88,6 +98,51 @@
 			"mapLinkLabel": "Navigeren",
 			"lon": 5.14473233,
 			"lat": 52.07786772
+		},
+		"page": {
+			"pageTitle": "Contact",
+			"pageIntro": "Vragen over lidmaatschap, trainingen of wedstrijden? Neem contact met ons op via onderstaande gegevens.",
+			"metaTitle": "Contact | UBV The Eagles",
+			"metaDescription": "Contactgegevens, postadres, speellocatie en het bestuur van UBV The Eagles."
+		},
+		"board": {
+			"title": "Bestuur",
+			"intro": "Het bestuur van UBV The Eagles bestaat uit de volgende personen:",
+			"lastMinute": "Voor last-minute wedstrijdzaken kan contact worden opgenomen met Dennis Liersen of Wouter Kitsz.",
+			"phoneLabel": "Telefoon",
+			"emailLabel": "E-mail",
+			"members": [
+				{
+					"role": "Voorzitter",
+					"name": "Wieger Eekma",
+					"phone": "06-47478892",
+					"email": "voorzitter@utrechteagles.nl"
+				},
+				{
+					"role": "Secretaris",
+					"name": "Rachid Kolfin",
+					"phone": "06-19598847",
+					"email": "secretaris@utrechteagles.nl"
+				},
+				{
+					"role": "Penningmeester",
+					"name": "Sander vd Horst",
+					"phone": "",
+					"email": "knip@utrechteagles.nl"
+				},
+				{
+					"role": "Wedsec",
+					"name": "Dennis Liersen",
+					"phone": "06-15436462",
+					"email": "wedsec@utrechteagles.nl"
+				},
+				{
+					"role": "Scheidsrechters",
+					"name": "Wouter Kitsz",
+					"phone": "06-83910511",
+					"email": "scheids@utrechteagles.nl"
+				}
+			]
 		}
 	}
 }

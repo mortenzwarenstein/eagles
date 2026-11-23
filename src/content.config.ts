@@ -43,6 +43,15 @@ const home = defineCollection({
 			kicker: z.string(),
 			title: z.string(),
 			intro: z.string(),
+			page: z.object({ pageTitle: z.string(), pageIntro: z.string(), metaTitle: z.string(), metaDescription: z.string() }),
+			board: z.object({
+				title: z.string(),
+				intro: z.string(),
+				lastMinute: z.string(),
+				phoneLabel: z.string(),
+				emailLabel: z.string(),
+				members: z.array(z.object({ role: z.string(), name: z.string(), phone: z.string(), email: z.string() })),
+			}),
 			postal: z.object({ title: z.string(), lines: z.array(z.string()) }),
 			venue: z.object({
 				title: z.string(),

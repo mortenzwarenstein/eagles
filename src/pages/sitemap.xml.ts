@@ -9,6 +9,7 @@ const PAGES: [nl: string, en: string][] = [
 	["/uitslagen/", "/en/uitslagen/"],
 	["/programma/", "/en/programma/"],
 	["/inschrijven/", "/en/inschrijven/"],
+	["/contact/", "/en/contact/"],
 ]
 
 export const GET: APIRoute = ({ site }) => {
