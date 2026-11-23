@@ -13,6 +13,7 @@ interface Props {
 }
 
 const { label, name, type = "text", required = false, autocomplete, inputmode, hint, class: className, customFieldId } = Astro.props
+const hintId = hint ? `${name.replace(/\W+/g, "-")}-hint` : undefined
 ---
 <label class:list={["block", className]}>
 	<span class="mb-2 block text-xs font-bold tracking-label text-white/55 uppercase">
@@ -24,8 +25,9 @@ const { label, name, type = "text", required = false, autocomplete, inputmode, h
 		required={required}
 		autocomplete={autocomplete}
 		inputmode={inputmode}
+		aria-describedby={hintId}
 		data-custom-field-id={customFieldId}
-		class="w-full border border-white/25 bg-white/6 px-4 py-3 text-white transition placeholder:text-white/35 focus:border-gold focus:bg-white/10"
+		class="w-full border border-white/25 bg-white/6 px-4 py-3 text-white transition placeholder:text-white/60 focus:border-gold focus:bg-white/10"
 	/>
-	{hint && <span class="mt-2 block text-xs leading-5 text-white/50">{hint}</span>}
+	{hint && <span id={hintId} class="mt-2 block text-xs leading-5 text-white/50">{hint}</span>}
 </label>

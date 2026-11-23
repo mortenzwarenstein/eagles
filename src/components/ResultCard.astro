@@ -1,5 +1,6 @@
 ---
 import Logo from "../assets/images/eag_logo.png"
+import { Image } from "astro:assets"
 
 import { initials, OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
 import { useTranslations, type Locale } from "../i18n"
@@ -28,7 +29,7 @@ const teams = [
 			<div data-team class="flex items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-3">
 					<span data-logo hidden={!team.isEagles} class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white p-1">
-						<img src={Logo.src} alt="" class="size-full object-contain" />
+						<Image src={Logo} width={96} alt="" class="size-full object-contain" />
 					</span>
 					<span
 						data-initials

@@ -50,7 +50,7 @@ const lines = (text: string) => text.split("\n")
 <MainLayout title={content.meta.title} description={content.meta.description} current="home">
 	<main id="main" data-live-matches data-locale={bcp47} data-results-limit={RESULTS_LIMIT} data-fixtures-limit={FIXTURES_LIMIT} data-messages={JSON.stringify(messages)}>
 		<section class="relative flex min-h-[720px] items-end overflow-hidden bg-navy text-white">
-			<Image src={heroImage} alt="" width={2000} loading="eager" class="absolute inset-0 h-full w-full object-cover object-center opacity-40" />
+			<Image src={heroImage} alt="" width={2000} widths={[640, 1024, 1600, 2000]} sizes="100vw" quality={60} loading="eager" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover object-center opacity-40" />
 			<div class="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-navy/30"></div>
 			<div class="relative mx-auto w-full max-w-[1400px] px-5 pt-36 pb-16 sm:px-8 lg:px-12 lg:pb-20">
 				<div class="max-w-4xl">
@@ -155,13 +155,13 @@ const lines = (text: string) => text.split("\n")
 				<div class="max-w-3xl">
 					<div class="grid gap-8 border-t border-navy/20 pt-6 sm:grid-cols-2">
 						<div>
-							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/60 uppercase">{content.contact.postal.title}</h3>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/70 uppercase">{content.contact.postal.title}</h3>
 							<address class="text-sm leading-6 not-italic">
 								{content.contact.postal.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
 							</address>
 						</div>
 						<div>
-							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/60 uppercase">{content.contact.venue.title}</h3>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/70 uppercase">{content.contact.venue.title}</h3>
 							<address class="text-sm leading-6 not-italic">
 								{content.contact.venue.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
 							</address>
@@ -173,7 +173,7 @@ const lines = (text: string) => text.split("\n")
 						target="_blank"
 						rel="noopener"
 						class="link-arrow mt-5"
-					>{content.contact.venue.mapLinkLabel} <ArrowUpRight /></a>
+					>{content.contact.venue.mapLinkLabel} <span class="sr-only">{t("link.newTab")}</span> <ArrowUpRight /></a>
 				</div>
 			</div>
 		</section>

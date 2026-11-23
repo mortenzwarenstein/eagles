@@ -23,7 +23,7 @@ export function createSelect(
 		li.id = `team-option-${i}`
 		li.setAttribute("role", "option")
 		li.textContent = option.label
-		li.className = "cursor-pointer px-4 py-3 text-sm font-semibold text-white/80 aria-selected:text-gold data-active:bg-white/10 data-active:text-white"
+		li.className = "cursor-pointer px-4 py-3 text-sm font-semibold text-white/80 aria-selected:text-gold data-active:bg-white/10 data-active:text-white data-active:outline-2 data-active:-outline-offset-2 data-active:outline-gold"
 		li.addEventListener("click", () => choose(i))
 		li.addEventListener("mousemove", () => setActive(i))
 		return li
@@ -129,4 +129,10 @@ export function syncUrl(page: number, team: string) {
 	if (team) url.searchParams.set("team", team)
 	else url.searchParams.delete("team")
 	history.replaceState(null, "", url)
+}
+
+/** Scrolls `el` into view, without animation for visitors who prefer reduced motion. */
+export function scrollToTop(el: HTMLElement) {
+	const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
+	el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
 }

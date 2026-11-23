@@ -75,7 +75,7 @@ const PAGE_SIZE = 12
 <script>
 	import { fetchMatches, ourTeam, selectSchedule, type Match } from "../../lib/matches"
 	import { renderFixture } from "../../lib/render-fixture"
-	import { createSelect, renderPagination, syncUrl, type PaginationLabels } from "../../lib/list-controls"
+	import { createSelect, renderPagination, scrollToTop, syncUrl, type PaginationLabels } from "../../lib/list-controls"
 
 	const root = document.querySelector<HTMLElement>("[data-live-fixtures]")!
 	const messages: Record<"error" | "noFixtures", string> = JSON.parse(root.dataset.messages!)
@@ -114,7 +114,7 @@ const PAGE_SIZE = 12
 			show(slice.map((match) => renderFixture(fixtureTemplate, match)), messages.noFixtures)
 			renderPagination(nav, pagination, page, pages, (next) => render(next, true))
 			syncUrl(page, team)
-			if (moved) root.scrollIntoView({ behavior: "smooth", block: "start" })
+			if (moved) scrollToTop(root)
 		}
 
 		createSelect(filter, [{ value: "", label: allTeamsLabel }, ...teams.map((name) => ({ value: name, label: name }))], team, (value) => {
