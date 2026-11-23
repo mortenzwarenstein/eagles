@@ -39,3 +39,76 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Point the cluster at the image that was just pushed. Argo CD syncs the cicd repo
+  # and rolls the deployment, so nobody has to `kubectl rollout restart` by hand.
+  bump:
+    needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: bump-cicd
+      cancel-in-progress: false
+    env:
+      OVERLAY: apps/eagles/overlays/prod/kustomization.yaml
+    steps:
+      - name: Skip if a newer commit exists
+        id: fresh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/commits/$GITHUB_REF_NAME" | jq -r .sha)
+          if [ "$head" = "$GITHUB_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "A newer commit on $GITHUB_REF_NAME exists, its own run will bump the tag."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up SSH for the cicd repo
+        if: steps.fresh.outputs.current == 'true'
+        env:
+          CICD_DEPLOY_KEY: ${{ secrets.CICD_DEPLOY_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          install -m 600 /dev/null ~/.ssh/cicd_key
+          printf '%s\n' "$CICD_DEPLOY_KEY" > ~/.ssh/cicd_key
+          curl -fsS https://api.github.com/meta | jq -r '.ssh_keys[] | "github.com " + .' > ~/.ssh/known_hosts
+
+      - name: Bump image tag in cicd
+        if: steps.fresh.outputs.current == 'true'
+        run: |
+          set -euo pipefail
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/cicd_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          tag="sha-${GITHUB_SHA::7}"
+
+          git clone --depth 1 git@github.com:mortenzwarenstein/cicd.git cicd
+          cd cicd
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3 4 5; do
+            git fetch --depth 1 origin main
+            git reset --hard origin/main
+            sed -i -E "s|^([[:space:]]*newTag:[[:space:]]*).*$|\1${tag}|" "$OVERLAY"
+            grep -q "newTag: ${tag}$" "$OVERLAY" || { echo "Could not set newTag in $OVERLAY" >&2; exit 1; }
+            if git diff --quiet; then
+              echo "cicd already points at ${tag}"
+              exit 0
+            fi
+            git commit -q -am "chore(eagles): deploy ${tag}"
+            if git push origin HEAD:main; then
+              echo "cicd now points at ${tag}"
+              exit 0
+            fi
+            echo "Push rejected (attempt ${attempt}), retrying"
+            sleep $((attempt * 3))
+          done
+          echo "Giving up after 5 attempts" >&2
+          exit 1
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/cicd_key

@@ -22,7 +22,7 @@
 	"fixtures": {
 		"kicker": "Coming up",
 		"title": "Next\nmatches",
-		"intro": "Come along and cheer on Men's 1, 2, 3 and 4 at their next game.",
+		"intro": "Come along and cheer on Men's 1, 2 and 3 at their next game.",
 		"linkLabel": "Full programme",
 		"page": {"pageTitle": "Schedule", "pageIntro": "When do we play? All upcoming matches of this season, right here.", "metaTitle": "Schedule | UBV The Eagles", "metaDescription": "All upcoming UBV The Eagles matches of the current season."}
 	},
