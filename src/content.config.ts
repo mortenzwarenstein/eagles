@@ -33,6 +33,22 @@ const home = defineCollection({
 			cta: z.string(),
 			form: z.record(z.string(), z.string()),
 		}),
+		contact: z.object({
+			kicker: z.string(),
+			title: z.string(),
+			intro: z.string(),
+			postal: z.object({ title: z.string(), lines: z.array(z.string()) }),
+			venue: z.object({
+				title: z.string(),
+				text: z.string(),
+				lines: z.array(z.string()),
+				lon: z.number(),
+				lat: z.number(),
+				mapQuery: z.string(),
+				mapTitle: z.string(),
+				mapLinkLabel: z.string(),
+			}),
+		}),
 	}),
 })
 

@@ -24,6 +24,7 @@ const navItems = [
     current === "join"
         ? { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: true, section: "join" }
         : { label: t("nav.join"), href: `${prefix}#join`, current: false, section: "join" },
+    { label: t("nav.contact"), href: `${prefix}#contact`, current: false, section: "contact" },
 ]
 const otherLocales = locales
     .filter((l) => l !== locale)
