@@ -1,0 +1,33 @@
+---
+import type { GetStaticPaths } from "astro"
+import MainLayout from "../../layouts/main.astro"
+import RegistrationForm from "../../components/RegistrationForm.astro"
+import { fetchPlans } from "../../lib/registration"
+import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+
+export const getStaticPaths = (() =>
+	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+
+const locale = resolveLocale(Astro.currentLocale)
+const t = useTranslations(locale)
+const content = await getHomeContent(locale)
+const plans = await fetchPlans()
+
+const lines = (text: string) => text.split("\n")
+---
+<MainLayout title={`${content.join.kicker} | UBV The Eagles`} description={content.join.intro} headerVariant="page" current="join">
+	<main id="main" class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
+		<div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
+			<div>
+				<p class="section-kicker text-gold">{content.join.kicker}</p>
+				<h1 class="section-title text-white">
+					{lines(content.join.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+				</h1>
+				<p class="mt-5 max-w-sm text-sm leading-6 text-white/70">{content.join.intro}</p>
+			</div>
+			<div class="max-w-3xl">
+				<RegistrationForm plans={plans} bcp47={t("locale.bcp47")} labels={content.join.form} />
+			</div>
+		</div>
+	</main>
+</MainLayout>

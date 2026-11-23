@@ -1,0 +1,71 @@
+# Astro static build (nl at /, en at /en/, pages as <route>/index.html)
+
+DirectoryIndex index.html
+Options -Indexes -MultiViews
+
+# Directory URLs without a trailing slash (/inschrijven -> /inschrijven/) are
+# redirected by mod_dir (DirectorySlash is on by default), so no rewrite is needed.
+
+# Custom 404 page
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Never serve dotfiles (.htaccess, .git, ...)
+  RewriteRule (^|/)\.(?!well-known/) - [F,L]
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml \
+    application/javascript text/javascript application/json image/svg+xml \
+    application/xml application/rss+xml
+</IfModule>
+
+# Content types
+<IfModule mod_mime.c>
+  AddType image/svg+xml .svg .svgz
+  AddType font/woff2 .woff2
+  AddType text/javascript .js .mjs
+  AddDefaultCharset UTF-8
+</IfModule>
+
+# Caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 hour"
+
+  # HTML must always revalidate so a new deploy is visible immediately
+  ExpiresByType text/html "access plus 0 seconds"
+
+  ExpiresByType image/x-icon "access plus 1 week"
+  ExpiresByType image/svg+xml "access plus 1 week"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/avif "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Astro fingerprints everything in /_astro/, so it is safe to cache forever
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  # Security headers
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>

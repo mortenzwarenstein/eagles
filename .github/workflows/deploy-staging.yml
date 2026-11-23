@@ -1,0 +1,56 @@
+name: Deploy staging
+
+# Push to the `staging` branch (or run manually) to publish a password-protected,
+# non-indexed copy of the site on the staging subdomain.
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          SITE: https://staging.utrechteagles.nl
+        run: npm run build
+
+      - name: Make staging private (basic auth + no indexing)
+        run: |
+          # Keep search engines out, twice: robots.txt and a response header.
+          printf 'User-agent: *\nDisallow: /\n' > dist/robots.txt
+          rm -f dist/sitemap.xml
+          cat >> dist/.htaccess <<'HT'
+
+          # --- STAGING ONLY: password protection, appended by deploy-staging.yml ---
+          AuthType Basic
+          AuthName "Eagles staging"
+          AuthUserFile /customers/8/2/b/utrechteagles.nl/httpd.private/.htpasswd
+          Require valid-user
+          <IfModule mod_headers.c>
+            Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+          </IfModule>
+          HT
+
+      - name: Deploy to one.com over SFTP
+        uses: ./.github/actions/sftp-deploy
+        with:
+          host: ${{ secrets.ONECOM_SFTP_HOST }}
+          user: ${{ secrets.ONECOM_SFTP_USER }}
+          key: ${{ secrets.ONECOM_SSH_KEY }}
+          remote-dir: ${{ secrets.ONECOM_REMOTE_DIR }}

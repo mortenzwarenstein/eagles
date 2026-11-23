@@ -1,17 +1,44 @@
 ---
 import "../styles/global.css"
+import { getImage } from "astro:assets"
+import ogSource from "../assets/images/team-heren-1.jpg"
+import logo from "../assets/images/eag_logo.png"
 
 import Header from "../components/Header.astro"
 import Footer from "../components/Footer.astro"
-import { locales, localizedPathname, resolveLocale } from "../i18n"
+import { defaultLocale, locales, localizedPathname, resolveLocale, useTranslations } from "../i18n"
 
 interface Props {
     title: string
     description?: string
+    headerVariant?: "home" | "page"
+    current?: "home" | "join"
+    /** Keep the page out of search results (e.g. the 404 page). */
+    noindex?: boolean
 }
 
-const { title, description } = Astro.props
+const { title, description, headerVariant, current, noindex = false } = Astro.props
 const locale = resolveLocale(Astro.currentLocale)
+const t = useTranslations(locale)
+
+const siteName = "UBV The Eagles"
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url)
+const alternateUrl = (l: (typeof locales)[number]) => new URL(localizedPathname(Astro.url.pathname, l), canonical)
+const ogImage = await getImage({ src: ogSource, width: 1200, height: 630, fit: "cover", format: "jpg" })
+const ogImageUrl = new URL(ogImage.src, canonical)
+const logoImage = await getImage({ src: logo, width: 512, format: "png" })
+
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SportsOrganization",
+    name: siteName,
+    sport: "Basketball",
+    url: new URL("/", canonical).href,
+    logo: new URL(logoImage.src, canonical).href,
+    image: ogImageUrl.href,
+    address: { "@type": "PostalAddress", addressLocality: "Utrecht", addressCountry: "NL" },
+}
+const analyticsId = import.meta.env.PUBLIC_GA_ID
 ---
 <html lang={locale}>
 <head>
@@ -22,13 +49,48 @@ const locale = resolveLocale(Astro.currentLocale)
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    {locales.map((l) => (
-        <link rel="alternate" hreflang={l} href={new URL(localizedPathname(Astro.url.pathname, l), Astro.url)} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && locales.map((l) => <link rel="alternate" hreflang={l} href={alternateUrl(l)} />)}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={alternateUrl(defaultLocale)} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={t("locale.bcp47").replace("-", "_")} />
+    {locales.filter((l) => l !== locale).map((l) => (
+        <meta property="og:locale:alternate" content={useTranslations(l)("locale.bcp47").replace("-", "_")} />
     ))}
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImageUrl} />
+    {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {analyticsId && (
+        <>
+            <script is:inline define:vars={{ analyticsId }}>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                // Consent Mode v2: no cookies / ad storage until a consent banner grants it.
+                gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+                gtag('js', new Date());
+                gtag('config', analyticsId);
+            </script>
+            <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}></script>
+        </>
+    )}
 </head>
-<body>
-<Header locale={locale} />
+<body class="flex min-h-dvh flex-col">
+<a
+    href="#main"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-gold focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-navy"
+>{t("skip.main")}</a>
+<Header locale={locale} variant={headerVariant} current={current} />
     <slot></slot>
-<Footer />
+<Footer locale={locale} />
 </body>
 </html>

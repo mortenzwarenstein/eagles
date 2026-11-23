@@ -3,11 +3,12 @@ import ArrowLeft from "./icons/ArrowLeft.astro"
 import ArrowRight from "./icons/ArrowRight.astro"
 
 interface Props {
+	label: string
 	prevLabel: string
 	nextLabel: string
 }
 
-const { prevLabel, nextLabel } = Astro.props
+const { label, prevLabel, nextLabel } = Astro.props
 const buttonClass =
 	"flex size-11 items-center justify-center border border-white/25 text-white transition hover:bg-gold hover:text-navy disabled:pointer-events-none disabled:opacity-30"
 ---
@@ -16,7 +17,7 @@ const buttonClass =
 	(e.g. basis-full lg:basis-[calc((100%-2rem)/3)] for 3 visible slides on desktop).
 -->
 <div data-carousel>
-	<ul data-carousel-track class="flex cursor-grab select-none snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+	<ul data-carousel-track tabindex="0" aria-label={label} class="flex cursor-grab select-none snap-x snap-mandatory gap-4 overflow-x-auto motion-safe:scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 		<slot />
 	</ul>
 	<div class="mt-6 flex justify-end gap-2">
@@ -86,6 +87,8 @@ const buttonClass =
 		next.addEventListener("click", () => track.scrollBy({ left: step() }))
 		track.addEventListener("scroll", update, { passive: true })
 		window.addEventListener("resize", update)
+		// Slides may be replaced after load (e.g. refreshed client-side).
+		new MutationObserver(update).observe(track, { childList: true })
 		update()
 	})
 </script>

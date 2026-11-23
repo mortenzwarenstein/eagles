@@ -1,0 +1,56 @@
+name: Deploy dist/ to one.com over SFTP (key auth)
+description: Mirrors ./dist to a remote directory with lftp, authenticating with an SSH key and a pinned host key.
+
+inputs:
+  host:
+    description: SFTP host
+    required: true
+  user:
+    description: SFTP user
+    required: true
+  key:
+    description: Private SSH key (deploy key)
+    required: true
+  remote-dir:
+    description: Absolute remote directory that dist/ is mirrored into. Anything else in it is DELETED.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install lftp
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y lftp
+
+    - name: Mirror dist/ to remote
+      shell: bash
+      env:
+        SFTP_HOST: ${{ inputs.host }}
+        SFTP_USER: ${{ inputs.user }}
+        SSH_KEY: ${{ inputs.key }}
+        REMOTE_DIR: ${{ inputs.remote-dir }}
+      run: |
+        set -euo pipefail
+
+        # --delete wipes everything in the target that is not in dist/, so refuse anything
+        # that does not look like a deep path inside the customer account.
+        if [[ "$REMOTE_DIR" != /customers/*/*/*/*/* ]]; then
+          echo "Refusing to deploy: REMOTE_DIR must be an absolute path inside /customers/..." >&2
+          exit 1
+        fi
+        test -f dist/index.html || { echo "dist/index.html missing, refusing to deploy" >&2; exit 1; }
+
+        install -d -m 700 ~/.ssh
+        install -m 600 /dev/null ~/.ssh/deploy_key
+        printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+        # Pinned host key (fail closed if One.com's key ever changes)
+        cp "$GITHUB_ACTION_PATH/../../known_hosts" ~/.ssh/known_hosts
+
+        lftp -u "$SFTP_USER,unused" "sftp://$SFTP_HOST" <<EOF
+        set sftp:connect-program "ssh -a -x -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes"
+        set net:max-retries 3
+        mirror --reverse --delete --verbose --parallel=4 dist "$REMOTE_DIR"
+        bye
+        EOF
+
+        rm -f ~/.ssh/deploy_key

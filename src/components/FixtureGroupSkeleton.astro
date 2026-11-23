@@ -1,0 +1,29 @@
+---
+interface Props {
+	/** Number of fixture rows in this date block */
+	count?: number
+}
+
+const { count = 1 } = Astro.props
+
+// Loading placeholder with the same dimensions as FixtureGroup + FixtureCard, so nothing shifts once data arrives.
+const bar = "inline-block rounded-sm bg-navy/10 align-middle"
+---
+<div aria-hidden="true" class="grid grid-cols-[3rem_1fr] items-start border-b border-navy/20 py-5 pl-4 motion-safe:animate-pulse sm:grid-cols-[3.5rem_1fr] sm:pl-5">
+	<div class="flex flex-col leading-none">
+		<span class="font-score text-4xl font-bold"><span class:list={[bar, "h-[0.8em] w-10"]}></span></span>
+		<span class="mt-1.5 text-xs leading-none"><span class:list={[bar, "h-[0.9em] w-8"]}></span></span>
+	</div>
+	<div class="divide-y divide-navy/10">
+		{Array.from({ length: count }, () => (
+			<div class="grid grid-cols-[3.25rem_1fr] items-center gap-x-4 py-4 pr-4 pl-4 first:pt-0 last:pb-0 sm:grid-cols-[3.25rem_minmax(0,1.8fr)_minmax(0,1fr)] sm:gap-x-7 sm:pr-5">
+				<span class="font-score text-2xl leading-none"><span class:list={[bar, "h-[0.8em] w-full"]}></span></span>
+				<div class="min-w-0">
+					<p class="text-xl leading-tight sm:text-2xl"><span class:list={[bar, "h-[0.7em] w-3/4"]}></span></p>
+					<p class="text-xl leading-tight sm:text-2xl"><span class:list={[bar, "h-[0.7em] w-1/2"]}></span></p>
+				</div>
+				<p class="hidden text-xs sm:block"><span class:list={[bar, "h-[0.9em] w-4/5"]}></span></p>
+			</div>
+		))}
+	</div>
+</div>

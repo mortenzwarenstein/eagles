@@ -1,0 +1,177 @@
+---
+import ArrowRight from "./icons/ArrowRight.astro"
+import FormField from "./FormField.astro"
+import { JERSEY_NUMBER_FIELD_ID, REGISTRATION_ENDPOINT, formatPrice, type Plan } from "../lib/registration"
+
+interface Props {
+	plans: Plan[]
+	bcp47: string
+	labels: Record<string, string>
+}
+
+const { plans, bcp47, labels } = Astro.props
+---
+<form
+	data-registration-form
+	data-endpoint={REGISTRATION_ENDPOINT}
+	data-sending-label={labels.sending}
+	class="space-y-10"
+>
+	<fieldset class="grid gap-5 sm:grid-cols-6">
+		<legend class="mb-5 font-display text-2xl font-bold tracking-wide text-gold uppercase">{labels.person}</legend>
+		<FormField class="sm:col-span-3" label={labels.firstName} name="FirstName" required autocomplete="given-name" />
+		<FormField class="sm:col-span-3" label={labels.infix} name="NameInfix" />
+		<FormField class="sm:col-span-6" label={labels.lastName} name="LastName" required autocomplete="family-name" />
+		<label class="block sm:col-span-3">
+			<span class="mb-2 block text-xs font-bold tracking-label text-white/55 uppercase">{labels.gender} <span class="text-gold" aria-hidden="true">*</span></span>
+			<select
+				name="Gender"
+				required
+				class="w-full border border-white/25 bg-navy px-4 py-3 text-white transition focus:border-gold"
+			>
+				<option value="" disabled selected>{labels.genderPlaceholder}</option>
+				<option value="0">{labels.male}</option>
+				<option value="1">{labels.female}</option>
+				<option value="2">{labels.other}</option>
+			</select>
+		</label>
+		<FormField class="sm:col-span-3" label={labels.birthDate} name="BirthDate" type="date" required autocomplete="bday" />
+		<FormField class="sm:col-span-3" label={labels.email} name="Email.Email" type="email" required autocomplete="email" />
+		<FormField class="sm:col-span-3" label={labels.phone} name="MobilePhone.Number" type="tel" required autocomplete="tel" />
+	</fieldset>
+
+	<fieldset class="grid gap-5 sm:grid-cols-6">
+		<legend class="mb-5 font-display text-2xl font-bold tracking-wide text-gold uppercase">{labels.address}</legend>
+		<FormField class="sm:col-span-2" label={labels.zipcode} name="AddressInfo.zipcode" required autocomplete="postal-code" />
+		<FormField class="sm:col-span-2" label={labels.houseNumber} name="AddressInfo.houseNumber" required inputmode="numeric" />
+		<FormField class="sm:col-span-2" label={labels.houseNumberExtension} name="AddressInfo.houseNumberExtension" />
+		<FormField class="sm:col-span-3" label={labels.street} name="AddressInfo.address1" autocomplete="address-line1" />
+		<FormField class="sm:col-span-3" label={labels.city} name="AddressInfo.city" autocomplete="address-level2" />
+	</fieldset>
+
+	<fieldset>
+		<legend class="mb-2 font-display text-2xl font-bold tracking-wide text-gold uppercase">{labels.membership}</legend>
+		<p class="mb-5 text-xs leading-5 text-white/50">{labels.membershipHint}</p>
+		<div class="grid gap-3">
+			{plans.map((plan) => (
+				<label
+					data-plan
+					data-from-age={plan.fromAge}
+					data-to-age={plan.toAge}
+					class="flex cursor-pointer items-center justify-between gap-4 border border-white/25 bg-white/6 px-4 py-4 transition hover:bg-white/10 has-checked:border-gold has-checked:bg-gold/10"
+				>
+					<span class="flex items-center gap-3">
+						<input type="radio" name="PlanAssignment.planId" value={plan.id} required class="size-5 shrink-0 accent-gold" />
+						<span class="font-semibold">{plan.name}</span>
+					</span>
+					<span class="font-score text-xl text-gold">{formatPrice(plan.price, bcp47)}</span>
+				</label>
+			))}
+		</div>
+		<p data-no-plans hidden class="mt-3 text-sm text-gold">{labels.noPlans}</p>
+	</fieldset>
+
+	<fieldset class="grid gap-5">
+		<legend class="mb-5 font-display text-2xl font-bold tracking-wide text-gold uppercase">{labels.extra}</legend>
+		<FormField
+			class="max-w-xs"
+			label={labels.jerseyNumber}
+			name="jerseyNumber"
+			type="number"
+			inputmode="numeric"
+			hint={labels.jerseyHint}
+			customFieldId={JERSEY_NUMBER_FIELD_ID}
+		/>
+	</fieldset>
+
+	<div>
+		<button
+			type="submit"
+			class="flex items-center gap-3 bg-gold px-6 py-4 text-xs font-extrabold tracking-label text-navy uppercase transition hover:bg-white disabled:pointer-events-none disabled:opacity-60"
+		>
+			<span data-submit-label>{labels.submit}</span> <ArrowRight />
+		</button>
+		<p data-error hidden tabindex="-1" role="alert" class="mt-4 text-sm text-gold">{labels.error}</p>
+	</div>
+</form>
+
+<div data-success hidden tabindex="-1" role="status" class="border border-gold bg-gold/10 p-6 text-lg">{labels.success}</div>
+
+<script>
+	/** Sets `value` on `target` following a dotted path: setPath(o, "Email.Email", "a@b.c") -> { Email: { Email } } */
+	function setPath(target: Record<string, any>, path: string, value: unknown) {
+		const keys = path.split(".")
+		const last = keys.pop()!
+		const parent = keys.reduce((obj, key) => (obj[key] ??= {}), target)
+		parent[last] = value
+	}
+
+	const form = document.querySelector<HTMLFormElement>("[data-registration-form]")!
+	const success = document.querySelector<HTMLElement>("[data-success]")!
+	const errorBox = form.querySelector<HTMLElement>("[data-error]")!
+	const submitButton = form.querySelector<HTMLButtonElement>("button[type=submit]")!
+	const submitLabel = form.querySelector<HTMLElement>("[data-submit-label]")!
+	const idleLabel = submitLabel.textContent!
+
+	// Only offer the plans that match the member's age.
+	const birthDate = form.elements.namedItem("BirthDate") as HTMLInputElement
+	const plans = Array.from(form.querySelectorAll<HTMLElement>("[data-plan]"))
+	const noPlans = form.querySelector<HTMLElement>("[data-no-plans]")!
+	const filterPlans = () => {
+		if (!birthDate.value) return plans.forEach((p) => (p.hidden = false))
+		const born = new Date(birthDate.value)
+		const now = new Date()
+		let age = now.getFullYear() - born.getFullYear()
+		if (now.getMonth() < born.getMonth() || (now.getMonth() === born.getMonth() && now.getDate() < born.getDate())) age--
+		let visible = 0
+		for (const plan of plans) {
+			const fits = age >= Number(plan.dataset.fromAge) && age <= Number(plan.dataset.toAge)
+			plan.hidden = !fits
+			const radio = plan.querySelector<HTMLInputElement>("input")!
+			radio.disabled = !fits
+			if (!fits) radio.checked = false
+			if (fits) visible++
+		}
+		noPlans.hidden = visible > 0
+	}
+	birthDate.addEventListener("change", filterPlans)
+
+	form.addEventListener("submit", async (event) => {
+		event.preventDefault()
+		errorBox.hidden = true
+		submitButton.disabled = true
+		submitLabel.textContent = form.dataset.sendingLabel!
+
+		const payload: Record<string, any> = {}
+		const customFields: { key: number; value: number }[] = []
+		for (const el of Array.from(form.elements) as HTMLInputElement[]) {
+			if (!el.name || el.disabled || (el.type === "radio" && !el.checked) || el.value === "") continue
+			if (el.dataset.customFieldId) {
+				customFields.push({ key: Number(el.dataset.customFieldId), value: Number(el.value) })
+			} else if (el.name === "Gender" || el.name === "PlanAssignment.planId") {
+				setPath(payload, el.name, Number(el.value))
+			} else {
+				setPath(payload, el.name, el.value.trim())
+			}
+		}
+		if (customFields.length) payload.CustomFieldValues = customFields
+
+		try {
+			const res = await fetch(form.dataset.endpoint!, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			})
+			if (!res.ok) throw new Error(`Registration failed with ${res.status}: ${await res.text()}`)
+			form.hidden = true
+			success.hidden = false
+			success.focus()
+		} catch (err) {
+			console.error(err)
+			errorBox.hidden = false
+			errorBox.focus()
+			submitButton.disabled = false
+			submitLabel.textContent = idleLabel
+		}
+	})
+</script>

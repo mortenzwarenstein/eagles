@@ -5,22 +5,25 @@ import { getRelativeLocaleUrl } from "astro:i18n"
 import { locales, localizedPathname, useTranslations, type Locale } from "../i18n"
 
 interface Props {
-    variant?: "home" | "schedule"
+    variant?: "home" | "page"
+    /** Nav item that represents the current page */
+    current?: "home" | "join"
     locale: Locale
 }
 
-const { variant = "home", locale } = Astro.props
+const { variant = "home", current, locale } = Astro.props
 const t = useTranslations(locale)
 const isHome = variant === "home"
 
 const homeUrl = getRelativeLocaleUrl(locale)
 const prefix = isHome ? "" : homeUrl
 const navItems = [
-    { label: t("nav.teams"), href: `${prefix}#teams` },
-    { label: t("nav.fixtures"), href: `${prefix}#fixtures` },
-    { label: t("nav.results"), href: `${prefix}#results` },
-    { label: t("nav.media"), href: `${prefix}#media` },
-    ...(isHome ? [{ label: t("nav.schedules"), href: getRelativeLocaleUrl(locale, "roosters") }] : []),
+    { label: t("nav.home"), href: homeUrl, current: current === "home", section: "home" },
+    { label: t("nav.results"), href: `${prefix}#results`, current: false, section: "results" },
+    { label: t("nav.fixtures"), href: `${prefix}#fixtures`, current: false, section: "fixtures" },
+    current === "join"
+        ? { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: true, section: "join" }
+        : { label: t("nav.join"), href: `${prefix}#join`, current: false, section: "join" },
 ]
 const otherLocales = locales
     .filter((l) => l !== locale)
@@ -29,14 +32,11 @@ const otherLocales = locales
 <header
     id="site-header"
     class:list={[
-        "z-30 text-white backdrop-blur-md transition-colors duration-300",
-        isHome
-            ? "fixed inset-x-0 top-0 border-b border-white/20 bg-white/10 data-scrolled:bg-navy/90"
-            : "sticky top-0 bg-navy/80",
+        "fixed inset-x-0 top-0 z-30 border-b border-white/20 bg-white/10 text-white backdrop-blur-md transition-colors duration-300 data-scrolled:bg-navy/90",
     ]}
 >
     <div class="mx-auto flex h-20 max-w-350 items-center justify-between px-5 sm:px-8 lg:px-12">
-        <a href={isHome ? "#top" : homeUrl} class="flex items-center gap-3" aria-label={t("header.homeLabel")}>
+        <a href={isHome ? "#main" : homeUrl} class="flex items-center gap-3" aria-label={t("header.homeLabel")}>
             <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-white p-2">
                 <img src={Logo.src} alt={t("header.logoAlt")} class="size-full object-contain" />
             </span>
@@ -46,31 +46,27 @@ const otherLocales = locales
         </a>
 
         <nav
-            class:list={["hidden items-center md:flex", isHome ? "gap-9" : "gap-8"]}
+            class="hidden items-center gap-9 md:flex"
             aria-label={t("nav.main")}
         >
             {navItems.map((item) => (
                 <a
                     href={item.href}
-                    class:list={[
-                        "text-xs font-bold tracking-[0.15em] uppercase transition hover:text-gold",
-                        isHome ? "text-white/80" : "text-white/70",
-                    ]}
+                    data-nav-section={isHome ? item.section : undefined}
+                    aria-current={item.current ? "page" : undefined}
+                    class="border-b border-transparent py-2 text-xs font-bold tracking-[0.15em] text-white/80 uppercase transition hover:text-gold aria-[current=page]:border-gold aria-[current=page]:text-gold"
                 >
                     {item.label}
                 </a>
             ))}
-            {!isHome && (
-                <span class="border-b border-gold pb-1 text-xs font-bold tracking-[0.15em] text-gold uppercase">{t("nav.schedules")}</span>
-            )}
             {otherLocales.map((l) => (
                 <a
                     href={l.href}
                     hreflang={l.code}
                     lang={l.code}
                     title={l.name}
-                    aria-label={`${t("nav.language")}: ${l.name}`}
-                    class="border border-white/30 px-2 py-1 text-xs font-bold tracking-[0.15em] text-white/80 transition hover:border-gold hover:text-gold"
+                    aria-label={`${l.label} – ${l.name}`}
+                    class="border border-white/30 px-2 py-2 text-xs font-bold tracking-[0.15em] text-white/80 transition hover:border-gold hover:text-gold"
                 >
                     {l.label}
                 </a>
@@ -96,16 +92,15 @@ const otherLocales = locales
 
     <nav
         id="mobile-nav"
-        class:list={["hidden border-t bg-navy px-5 py-6 md:hidden", isHome ? "border-white/20" : "border-white/15"]}
+        class="hidden border-t border-white/20 bg-navy px-5 py-6 md:hidden"
         aria-label={t("nav.mobile")}
     >
         <div class="flex flex-col gap-5">
             {navItems.map((item) => (
-                <a href={item.href} class="font-display text-2xl font-bold text-white uppercase">{item.label}</a>
+                <a href={item.href} data-nav-section={isHome ? item.section : undefined} aria-current={item.current ? "page" : undefined} class="w-fit border-b-2 border-transparent font-display text-2xl font-bold text-white uppercase aria-[current=page]:border-gold aria-[current=page]:text-gold">{item.label}</a>
             ))}
-            {!isHome && <span class="font-display text-2xl font-bold text-gold uppercase">{t("nav.schedules")}</span>}
             {otherLocales.map((l) => (
-                <a href={l.href} hreflang={l.code} lang={l.code} class="font-display text-2xl font-bold text-gold uppercase">{l.name}</a>
+                <a href={l.href} hreflang={l.code} lang={l.code} class="font-display text-2xl font-bold text-white/60 uppercase">{l.name}</a>
             ))}
         </div>
     </nav>
@@ -116,6 +111,32 @@ const otherLocales = locales
     const syncScrolled = () => header?.toggleAttribute("data-scrolled", window.scrollY > 8)
     syncScrolled()
     window.addEventListener("scroll", syncScrolled, { passive: true })
+
+    // Scroll spy: mark the nav link of the section currently in view (home page only)
+    const navLinks = document.querySelectorAll<HTMLAnchorElement>("[data-nav-section]")
+    const sections = [...new Set([...navLinks].map((a) => a.dataset.navSection!))]
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => el !== null)
+    const syncCurrent = () => {
+        const line = (header?.offsetHeight ?? 80) + 40
+        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+        let active = "home"
+        for (const el of sections) if (el.getBoundingClientRect().top <= line) active = el.id
+        if (atBottom && sections.length) active = sections[sections.length - 1].id
+        for (const a of navLinks) {
+            if (a.dataset.navSection === active) a.setAttribute("aria-current", "page")
+            else a.removeAttribute("aria-current")
+        }
+        const hash = active === "home" ? "" : `#${active}`
+        if (location.hash !== hash) {
+            history.replaceState(null, "", location.pathname + location.search + hash)
+        }
+    }
+    if (navLinks.length) {
+        syncCurrent()
+        window.addEventListener("scroll", syncCurrent, { passive: true })
+        window.addEventListener("resize", syncCurrent)
+    }
 
     const toggle = document.querySelector<HTMLButtonElement>("#nav-toggle")
     const mobileNav = document.querySelector<HTMLElement>("#mobile-nav")
@@ -129,6 +150,12 @@ const otherLocales = locales
     }
 
     toggle?.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"))
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && toggle?.getAttribute("aria-expanded") === "true") {
+            setOpen(false)
+            toggle.focus()
+        }
+    })
     mobileNav?.addEventListener("click", (e) => {
         if ((e.target as HTMLElement).closest("a")) setOpen(false)
     })

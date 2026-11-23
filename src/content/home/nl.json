@@ -4,17 +4,61 @@
 		"description": "UBV The Eagles is een van de oudste, kleinste en gezelligste basketbalverenigingen van Utrecht."
 	},
 	"hero": {
-		"kicker": "Een gezellige basketbalclub voor iedereen",
-		"title": "Samen spelen.",
-		"titleHighlight": "Samen groeien.",
-		"cta": { "label": "Ontdek onze club", "href": "#fixtures" },
-		"intro": "Basketbal in Utrecht doe je bij UBV The Eagles, één van de oudste, kleinste en gezelligste basketballverenigingen van Utrecht! Kijk rond voor alle clubinfo."
+		"kicker": "UBV The Eagles",
+		"title": "Basketbal in",
+		"titleHighlight": "Utrecht.",
+		"cta": {
+			"label": "Bekijk het programma",
+			"href": "#fixtures"
+		},
+		"intro": "Een van de oudste, kleinste en gezelligste basketbalverenigingen van Utrecht. Kom kijken bij een wedstrijd of speel gewoon mee."
 	},
-	"results": { "kicker": "Eindstand", "title": "Laatste uitslagen", "linkLabel": "Alle uitslagen" },
+	"results": {
+		"kicker": "Eindstand",
+		"title": "Laatste uitslagen",
+		"linkLabel": "Alle uitslagen"
+	},
 	"fixtures": {
 		"kicker": "Binnenkort",
 		"title": "Volgende\nwedstrijden",
 		"intro": "Kom gezellig kijken en moedig Heren 1, 2, 3 en 4 aan bij hun volgende wedstrijd.",
 		"linkLabel": "Volledig programma"
+	},
+	"join": {
+		"kicker": "Inschrijven",
+		"title": "Word lid",
+		"intro": "Leuk dat je je wilt aanmelden bij UBV The Eagles! Vul dit formulier in en we gaan je inschrijving verwerken.",
+		"form": {
+			"person": "Persoonsgegevens",
+			"address": "Adres",
+			"membership": "Lidmaatschap",
+			"extra": "Extra",
+			"firstName": "Voornaam",
+			"infix": "Tussenvoegsel",
+			"lastName": "Achternaam",
+			"gender": "Geslacht",
+			"genderPlaceholder": "Maak een keuze",
+			"male": "Man",
+			"female": "Vrouw",
+			"other": "Anders",
+			"birthDate": "Geboortedatum",
+			"email": "E-mail",
+			"phone": "Mobiel nummer",
+			"zipcode": "Postcode",
+			"houseNumber": "Huisnummer",
+			"houseNumberExtension": "Toevoeging",
+			"street": "Straat",
+			"city": "Woonplaats",
+			"jerseyNumber": "Rugnummer",
+			"jerseyHint": "Als je competitie wilt gaan spelen, vul dan je gewenste rugnummer in. Het kan zijn dat een ander lid het nummer al gebruikt, dan gaan we een ander nummer zoeken dat vrij is.",
+			"membershipHint": "Vul eerst je geboortedatum in om de beschikbare lidmaatschappen te zien.",
+			"noPlans": "Er zijn geen lidmaatschappen beschikbaar voor jouw leeftijd.",
+			"submit": "Aanmelden",
+			"sending": "Versturen…",
+			"success": "Dank voor je aanmelding. Er wordt zo spoedig mogelijk contact met je opgenomen.",
+			"error": "Je aanmelding is niet gelukt. Controleer je gegevens en probeer het opnieuw. Ben je al lid? Dan hoef je je niet nogmaals aan te melden."
+		},
+		"cta": "Naar het aanmeldformulier",
+		"teaser": "Basketballen bij The Eagles? Meld je aan als lid en speel mee, of train gezellig met ons mee."
 	}
 }

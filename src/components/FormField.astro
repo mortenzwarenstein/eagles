@@ -1,0 +1,31 @@
+---
+interface Props {
+	label: string
+	name: string
+	type?: "text" | "email" | "tel" | "date" | "number"
+	required?: boolean
+	autocomplete?: string
+	inputmode?: "numeric" | "text" | "tel" | "email"
+	hint?: string
+	class?: string
+	/** Set for fields that map to a Foys custom field */
+	customFieldId?: number
+}
+
+const { label, name, type = "text", required = false, autocomplete, inputmode, hint, class: className, customFieldId } = Astro.props
+---
+<label class:list={["block", className]}>
+	<span class="mb-2 block text-xs font-bold tracking-label text-white/55 uppercase">
+		{label}{required && <span class="text-gold" aria-hidden="true"> *</span>}
+	</span>
+	<input
+		type={type}
+		name={name}
+		required={required}
+		autocomplete={autocomplete}
+		inputmode={inputmode}
+		data-custom-field-id={customFieldId}
+		class="w-full border border-white/25 bg-white/6 px-4 py-3 text-white transition placeholder:text-white/35 focus:border-gold focus:bg-white/10"
+	/>
+	{hint && <span class="mt-2 block text-xs leading-5 text-white/50">{hint}</span>}
+</label>

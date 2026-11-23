@@ -1,0 +1,36 @@
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at once
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to one.com over SFTP
+        uses: ./.github/actions/sftp-deploy
+        with:
+          host: ${{ secrets.ONECOM_SFTP_HOST }}
+          user: ${{ secrets.ONECOM_SFTP_USER }}
+          key: ${{ secrets.ONECOM_SSH_KEY }}
+          remote-dir: ${{ secrets.ONECOM_REMOTE_DIR }}

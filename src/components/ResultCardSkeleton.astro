@@ -1,0 +1,19 @@
+---
+// Loading placeholder with the same dimensions as ResultCard (played match), so nothing shifts once data arrives.
+const bar = "inline-block rounded-sm bg-white/10 align-middle"
+---
+<div aria-hidden="true" class="flex h-full w-full flex-col border border-white/15 bg-white/6 p-5 motion-safe:animate-pulse">
+	<div class="mb-8 text-xs leading-4"><span class:list={[bar, "h-3 w-20"]}></span></div>
+	<div class="mt-auto space-y-3">
+		{[0, 1].map(() => (
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex min-w-0 flex-1 items-center gap-3">
+					<span class="size-7 shrink-0 rounded-full bg-white/10"></span>
+					<span class:list={[bar, "h-4 w-3/5"]}></span>
+				</div>
+				<span class="font-score text-3xl"><span class:list={[bar, "h-[0.8em] w-12"]}></span></span>
+			</div>
+		))}
+	</div>
+	<span class="mt-5 h-6 w-16 bg-white/10"></span>
+</div>

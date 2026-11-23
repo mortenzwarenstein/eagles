@@ -25,6 +25,14 @@ const home = defineCollection({
 			intro: z.string(),
 			linkLabel: z.string(),
 		}),
+		join: z.object({
+			kicker: z.string(),
+			title: z.string(),
+			intro: z.string(),
+			teaser: z.string(),
+			cta: z.string(),
+			form: z.record(z.string(), z.string()),
+		}),
 	}),
 })
 

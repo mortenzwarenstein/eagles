@@ -1,7 +1,7 @@
 ---
 import Logo from "../assets/images/eag_logo.png"
 
-import { shortenName, type Match } from "../lib/matches"
+import { initials, OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
 import { useTranslations, type Locale } from "../i18n"
 
 interface Props {
@@ -12,54 +12,42 @@ interface Props {
 const { result, locale } = Astro.props
 const t = useTranslations(locale)
 
-const outcomes = {
-	win: { label: t("outcome.win"), class: "bg-gold text-navy" },
-	draw: { label: t("outcome.draw"), class: "bg-white/15 text-white" },
-	loss: { label: t("outcome.loss"), class: "bg-white/15 text-white" },
-}
-const outcome = result.outcome ? outcomes[result.outcome] : undefined
-
 const teams = [
 	{ name: result.home, score: result.homeScore, isEagles: result.homeIsUs },
 	{ name: result.away, score: result.awayScore, isEagles: result.awayIsUs },
-].map((team) => ({
-	...team,
-	shortName: shortenName(team.name),
-	initials: team.name
-		.split(" ")
-		.map((word) => word[0])
-		.join("")
-		.slice(0, 2),
-}))
+].map((team) => ({ ...team, shortName: shortenName(team.name), initials: initials(team.name) }))
+
+// The data-* hooks are used by the client-side refresh on the home page.
 ---
 <article class="group flex h-full w-full flex-col border border-white/15 bg-white/6 p-5 transition hover:bg-white/10">
-	<div class="mb-8 flex items-start justify-between gap-4 text-[11px] font-bold tracking-label text-white/55 uppercase">
-		<span>{result.dateLabel}{!result.played && ` · ${result.time}`}</span>
+	<div class="mb-8 flex items-start justify-between gap-4 text-xs font-bold tracking-label text-white/55 uppercase">
+		<span data-date>{result.dateLabel}{!result.played && ` · ${result.time}`}</span>
 	</div>
 	<div class="mt-auto space-y-3">
 		{teams.map((team) => (
-			<div class="flex items-center justify-between gap-4">
+			<div data-team class="flex items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-3">
-					{team.isEagles ? (
-						<span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white p-1">
-							<img src={Logo.src} alt="" class="size-full object-contain" />
-						</span>
-					) : (
-						<span class="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-[9px] font-bold text-white/60">
-							{team.initials}
-						</span>
-					)}
-					<span title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
+					<span data-logo hidden={!team.isEagles} class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white p-1">
+						<img src={Logo.src} alt="" class="size-full object-contain" />
+					</span>
+					<span
+						data-initials
+						hidden={team.isEagles}
+						class="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-bold text-white/60"
+					>
+						{team.initials}
+					</span>
+					<span data-name title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
 				</div>
-				{result.played && <span class:list={["font-score text-3xl", !team.isEagles && "text-white/65"]}>{team.score}</span>}
+				{result.played && <span data-score class:list={["font-score text-3xl", !team.isEagles && "text-white/65"]}>{team.score}</span>}
 			</div>
 		))}
 	</div>
-	{outcome ? (
-		<span class:list={["mt-5 w-fit px-2 py-1 text-[10px] font-extrabold tracking-wider uppercase", outcome.class]}>
-			{outcome.label}
+	{result.outcome ? (
+		<span data-outcome class:list={["mt-5 w-fit px-2 py-1 text-xs font-extrabold tracking-wider uppercase", OUTCOME_CLASSES[result.outcome]]}>
+			{t(`outcome.${result.outcome}`)}
 		</span>
 	) : (
-		<span class="mt-5 text-[11px] font-bold tracking-label text-white/55 uppercase">{result.venue}</span>
+		<span class="mt-5 text-xs font-bold tracking-label text-white/55 uppercase">{result.venue}</span>
 	)}
 </article>

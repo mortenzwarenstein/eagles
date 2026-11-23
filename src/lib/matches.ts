@@ -76,7 +76,10 @@ function toMatch(m: ApiMatch, now: Date, format: Intl.DateTimeFormat): Match {
 	return match
 }
 
-/** All matches of the club this season, ordered by date. */
+/**
+ * All matches of the club this season, ordered by date.
+ * Runs both at build time and in the browser (the API allows cross-origin requests).
+ */
 export async function fetchMatches(locale = "nl-NL"): Promise<Match[]> {
 	const res = await fetch(`${API_URL}?clb_ID=${CLUB_ID}`)
 	if (!res.ok) throw new Error(`NBB API responded with ${res.status}`)
@@ -87,16 +90,50 @@ export async function fetchMatches(locale = "nl-NL"): Promise<Match[]> {
 }
 
 /** Played matches, newest first. */
-export async function fetchResults(limit?: number, locale?: string): Promise<Match[]> {
-	const results = (await fetchMatches(locale)).filter((m) => m.played).reverse()
+export function selectResults(matches: Match[], limit?: number): Match[] {
+	const results = matches.filter((m) => m.played).reverse()
 	return limit ? results.slice(0, limit) : results
 }
 
 /** Upcoming (not yet played) matches, soonest first. */
-export async function fetchSchedule(limit?: number): Promise<Match[]> {
-	const schedule = (await fetchMatches()).filter((m) => !m.played)
+export function selectSchedule(matches: Match[], limit?: number): Match[] {
+	const schedule = matches.filter((m) => !m.played)
 	return limit ? schedule.slice(0, limit) : schedule
 }
+
+export interface FixtureDay {
+	/** ISO date (YYYY-MM-DD) */
+	date: string
+	day: string
+	month: string
+	fixtures: Pick<Match, "time" | "home" | "away" | "venue">[]
+}
+
+/** Groups matches on the same day into one date block. */
+export function groupByDay(matches: Match[], locale = "nl-NL"): FixtureDay[] {
+	const monthFormat = new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" })
+	return Object.entries(Object.groupBy(matches, (match) => match.date.slice(0, 10))).map(([date, group]) => ({
+		date,
+		day: date.slice(8, 10),
+		month: monthFormat.format(new Date(`${date}T00:00:00Z`)).replace(".", ""),
+		fixtures: group!.map(({ time, home, away, venue }) => ({ time, home, away, venue })),
+	}))
+}
+
+/** Badge styling per outcome (kept here so the client-side renderer uses the same classes). */
+export const OUTCOME_CLASSES: Record<NonNullable<Match["outcome"]>, string> = {
+	win: "bg-gold text-navy",
+	draw: "bg-white/15 text-white",
+	loss: "bg-white/15 text-white",
+}
+
+/** "BC Utrecht Cangeroes" -> "BU" */
+export const initials = (name: string) =>
+	name
+		.split(" ")
+		.map((word) => word[0])
+		.join("")
+		.slice(0, 2)
 
 /**
  * Shortens a team name to at most `max` characters. The trailing team number

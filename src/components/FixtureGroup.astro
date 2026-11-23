@@ -1,22 +1,19 @@
 ---
-import FixtureCard, { type Fixture } from "./FixtureCard.astro"
+import FixtureCard from "./FixtureCard.astro"
+import type { FixtureDay } from "../lib/matches"
 
-interface Props {
-	/** ISO date (YYYY-MM-DD) shared by every fixture in the group */
-	date: string
-	month: string
-	day: string
-	fixtures: Fixture[]
-}
+type Props = FixtureDay
 
 const { date, day, month, fixtures } = Astro.props
+
+// The data-* hooks are used by the client-side refresh on the home page.
 ---
 <section class="grid grid-cols-[3rem_1fr] items-start border-b border-navy/20 py-5 pl-4 sm:grid-cols-[3.5rem_1fr] sm:pl-5">
-	<time datetime={date} class="flex flex-col leading-none">
-		<span class="font-score text-4xl font-bold">{day}</span>
-		<span class="mt-1.5 text-[10px] font-extrabold tracking-[0.16em] text-navy/50 uppercase">{month}</span>
+	<time data-date datetime={date} class="flex flex-col leading-none">
+		<span data-day class="font-score text-4xl font-bold">{day}</span>
+		<span data-month class="mt-1.5 text-xs font-extrabold tracking-[0.16em] text-navy/70 uppercase">{month}</span>
 	</time>
-	<div class="divide-y divide-navy/10">
+	<div data-fixtures class="divide-y divide-navy/10">
 		{fixtures.map((fixture) => <FixtureCard fixture={fixture} />)}
 	</div>
 </section>

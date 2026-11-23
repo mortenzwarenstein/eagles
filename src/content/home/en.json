@@ -4,17 +4,61 @@
 		"description": "UBV The Eagles is one of the oldest, smallest and friendliest basketball clubs in Utrecht."
 	},
 	"hero": {
-		"kicker": "A friendly basketball club for everyone",
-		"title": "Play together.",
-		"titleHighlight": "Grow together.",
-		"cta": { "label": "Discover our club", "href": "#fixtures" },
-		"intro": "Basketball in Utrecht means UBV The Eagles, one of the oldest, smallest and friendliest basketball clubs in the city! Take a look around for all club info."
+		"kicker": "UBV The Eagles",
+		"title": "Basketball in",
+		"titleHighlight": "Utrecht.",
+		"cta": {
+			"label": "See the fixtures",
+			"href": "#fixtures"
+		},
+		"intro": "One of the oldest, smallest and friendliest basketball clubs in Utrecht. Come and watch a game, or just join in."
 	},
-	"results": { "kicker": "Final score", "title": "Latest results", "linkLabel": "All results" },
+	"results": {
+		"kicker": "Final score",
+		"title": "Latest results",
+		"linkLabel": "All results"
+	},
 	"fixtures": {
 		"kicker": "Coming up",
 		"title": "Next\nmatches",
 		"intro": "Come along and cheer on Men's 1, 2, 3 and 4 at their next game.",
 		"linkLabel": "Full schedule"
+	},
+	"join": {
+		"kicker": "Join",
+		"title": "Become a member\nof The Eagles",
+		"intro": "Great that you want to join UBV The Eagles! Fill in this form and we will process your registration.",
+		"form": {
+			"person": "Personal details",
+			"address": "Address",
+			"membership": "Membership",
+			"extra": "Extra",
+			"firstName": "First name",
+			"infix": "Name prefix",
+			"lastName": "Last name",
+			"gender": "Gender",
+			"genderPlaceholder": "Select an option",
+			"male": "Male",
+			"female": "Female",
+			"other": "Other",
+			"birthDate": "Date of birth",
+			"email": "Email",
+			"phone": "Mobile number",
+			"zipcode": "Postcode",
+			"houseNumber": "House number",
+			"houseNumberExtension": "Addition",
+			"street": "Street",
+			"city": "City",
+			"jerseyNumber": "Jersey number",
+			"jerseyHint": "If you want to play in the league, enter your preferred jersey number. Another member may already use it, in which case we will find a free number for you.",
+			"membershipHint": "Enter your date of birth first to see the memberships available to you.",
+			"noPlans": "No memberships are available for your age.",
+			"submit": "Sign up",
+			"sending": "Sending…",
+			"success": "Thank you for signing up. We will contact you as soon as possible.",
+			"error": "Your registration did not go through. Please check your details and try again. Already a member? Then you don't need to sign up again."
+		},
+		"cta": "Go to the sign-up form",
+		"teaser": "Want to play basketball with The Eagles? Sign up as a member and join in, or just come and train with us."
 	}
 }

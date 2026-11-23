@@ -1,0 +1,13 @@
+---
+import MainLayout from "../layouts/main.astro"
+import { useTranslations } from "../i18n"
+
+const t = useTranslations("nl")
+---
+<MainLayout title={`404 | ${t("notFound.title")} | UBV The Eagles`} headerVariant="page" noindex>
+	<main id="main" class="flex flex-1 flex-col justify-center py-32 bg-navy px-5 text-white sm:px-8 lg:px-12">
+		<p aria-hidden="true" class="font-display text-[clamp(9rem,30vw,26rem)] leading-[0.8] font-black text-gold">404</p>
+		<h1 class="section-title text-white">{t("notFound.title")}</h1>
+		<p class="mt-5 max-w-md text-sm leading-6 text-white/80">{t("notFound.text")}</p>
+	</main>
+</MainLayout>
