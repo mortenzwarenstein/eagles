@@ -1,0 +1,18 @@
+name: Enforce staging to main
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only allow PRs from staging
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$HEAD_REF" != "staging" ]; then
+            echo "PRs into main must come from the staging branch (got: $HEAD_REF)"
+            exit 1
+          fi
