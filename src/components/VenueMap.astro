@@ -1,0 +1,42 @@
+---
+interface Props {
+	/** WGS84 coordinates of the marker */
+	lon: number
+	lat: number
+	/** Accessible name of the map */
+	label: string
+	class?: string
+}
+
+const { lon, lat, label, class: className } = Astro.props
+---
+<div
+	data-venue-map
+	data-lon={lon}
+	data-lat={lat}
+	role="region"
+	aria-label={label}
+	tabindex="0"
+	class:list={["aspect-[4/3] w-full border border-navy/20 bg-navy/5 sm:aspect-[16/9]", className]}
+></div>
+
+<script>
+	// OpenLayers is large: only download it once a map is about to scroll into view.
+	const load = (el: HTMLElement) => import("../lib/venue-map").then((m) => m.initVenueMap(el))
+	const maps = document.querySelectorAll<HTMLElement>("[data-venue-map]")
+	if ("IntersectionObserver" in window) {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue
+					observer.unobserve(entry.target)
+					load(entry.target as HTMLElement)
+				}
+			},
+			{ rootMargin: "300px" },
+		)
+		maps.forEach((el) => observer.observe(el))
+	} else {
+		maps.forEach(load)
+	}
+</script>

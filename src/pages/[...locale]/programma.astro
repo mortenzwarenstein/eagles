@@ -1,0 +1,45 @@
+---
+import MainLayout from "../../layouts/main.astro"
+import MatchList from "../../components/MatchList.astro"
+import FixtureRow from "../../components/FixtureRow.astro"
+import FixtureRowSkeleton from "../../components/FixtureRowSkeleton.astro"
+import { MATCH_LIST_PAGE_SIZE } from "../../lib/list-controls"
+import { BLANK_FIXTURE } from "../../lib/matches"
+import { getHomeContent, localeStaticPaths, resolveLocale, useTranslations } from "../../i18n"
+
+export const getStaticPaths = localeStaticPaths
+
+const locale = resolveLocale(Astro.currentLocale)
+const t = useTranslations(locale)
+const { fixtures } = await getHomeContent(locale)
+const page = fixtures.page
+
+// Fixtures are fetched in the browser (always up to date); skeletons show while they load.
+---
+<MainLayout title={page.metaTitle} description={page.metaDescription} headerVariant="page" current="fixtures">
+	<main id="main" class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
+		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+			<div class="mb-12">
+				<h1 class="section-title mt-0 text-white">{page.pageTitle}</h1>
+				<p class="mt-5 text-sm leading-6 text-white/70">{page.pageIntro}</p>
+			</div>
+
+			<MatchList locale={locale} emptyMessage={t("matches.noFixtures")}>
+				{Array.from({ length: MATCH_LIST_PAGE_SIZE }, () => <FixtureRowSkeleton />)}
+				<template slot="template" data-item-template><FixtureRow fixture={BLANK_FIXTURE} /></template>
+			</MatchList>
+		</div>
+	</main>
+</MainLayout>
+
+<script>
+	import { $ } from "../../lib/dom"
+	import { loadMatchList } from "../../lib/list-controls"
+	import { selectSchedule } from "../../lib/matches"
+	import { renderFixture } from "../../lib/render-match"
+
+	const root = $(document, "[data-match-list]")
+	const template = $<HTMLTemplateElement>(root, "[data-item-template]")
+
+	loadMatchList(root, (matches) => selectSchedule(matches), (match) => renderFixture(template, match))
+</script>

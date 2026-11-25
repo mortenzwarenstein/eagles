@@ -17,6 +17,8 @@ export interface Match {
 	away: string
 	homeIsUs: boolean
 	awayIsUs: boolean
+	homeClubId: number
+	awayClubId: number
 	venue: string
 	played: boolean
 	homeScore?: number
@@ -64,6 +66,8 @@ function toMatch(m: ApiMatch, now: Date, format: Intl.DateTimeFormat): Match {
 		away: teamName(m.uit_ploeg),
 		homeIsUs,
 		awayIsUs: m.uit_club_id === CLUB_ID,
+		homeClubId: m.thuis_club_id,
+		awayClubId: m.uit_club_id,
 		venue: [m.loc_naam, m.loc_plaats].filter(Boolean).join(", "),
 		played,
 	}
@@ -88,6 +92,9 @@ export async function fetchMatches(locale = "nl-NL"): Promise<Match[]> {
 	const format = dateFormat(locale)
 	return data.wedstrijden.map((m) => toMatch(m, now, format)).sort((a, b) => a.date.localeCompare(b.date))
 }
+
+/** Name of the club's own team in a match, e.g. "The Eagles MSE 1". */
+export const ourTeam = (match: Match) => (match.homeIsUs ? match.home : match.away)
 
 /** Played matches, newest first. */
 export function selectResults(matches: Match[], limit?: number): Match[] {
@@ -148,3 +155,12 @@ export function shortenName(name: string, max = 24): string {
 	if (room < 4) return name.slice(0, max - 1).trimEnd() + "…"
 	return base.slice(0, room).replace(/[\s\-–.,]+$/, "") + "…" + suffix
 }
+
+const BLANK_MATCH: Match = {
+	id: 0, date: "", dateLabel: "", time: "", home: "", away: "", homeIsUs: true, awayIsUs: false,
+	homeClubId: 0, awayClubId: 0, venue: "", played: false,
+}
+/** Empty played match, used to server-render the `<template>` the client-side result renderer clones. */
+export const BLANK_RESULT: Match = { ...BLANK_MATCH, played: true, homeScore: 0, awayScore: 0, outcome: "win" }
+/** Empty upcoming match, used to server-render the `<template>` the client-side fixture renderer clones. */
+export const BLANK_FIXTURE: Match = BLANK_MATCH

@@ -1,5 +1,4 @@
 /* Utrecht Eagles — Tailwind CSS v4 theme */
-@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900&family=DM+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -10,12 +9,13 @@
     --color-gold: #F4B223;
     --color-gold-dark: #C98A00;
     --color-gold-ink: #9A6A00;
+    --color-gold-deep: #7F5700;
     --color-paper: #F4F2EC;
     --color-paper-dim: #EAE6DC;
     --color-slate: #3A4B5C;
 
-    --font-display: "Barlow Condensed", Impact, sans-serif;
-    --font-sans: "DM Sans", system-ui, sans-serif;
+    --font-display: var(--font-barlow-condensed);
+    --font-sans: var(--font-dm-sans);
     --font-score: var(--font-display);
 
     --tracking-label: 0.14em;
@@ -31,15 +31,19 @@
 }
 
 @layer base {
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
     @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         * { transition-duration: 0.01ms !important; }
     }
-    section[id] { scroll-margin-top: 6rem; }
+    /* Sections clear the fixed header with their own top padding, so cancel the scroll-padding
+       above: an anchor lands on the section's top edge instead of showing the end of the previous one. */
+    section[id] { scroll-margin-top: -6rem; }
     :focus-visible { outline: 3px solid var(--color-gold-ink); outline-offset: 2px; }
     body { @apply bg-paper text-navy font-sans; }
-    a { @apply text-navy no-underline hover:text-gold-dark; }
+    /* Fill the viewport (body is a min-h-dvh flex column), so short pages don't show a gap below the footer. */
+    body > main { flex-grow: 1; }
+    a { @apply text-navy no-underline hover:text-gold-deep; }
     button, a, input { font: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
     button { @apply cursor-pointer; }

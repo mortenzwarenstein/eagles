@@ -1,0 +1,34 @@
+---
+import TeamBadge from "./TeamBadge.astro"
+
+import { shortenName, type Match } from "../lib/matches"
+
+interface Props {
+	fixture: Match
+}
+
+const { fixture } = Astro.props
+
+const teams = [
+	{ name: fixture.home, isEagles: fixture.homeIsUs },
+	{ name: fixture.away, isEagles: fixture.awayIsUs },
+].map((team) => ({ ...team, shortName: shortenName(team.name, 32) }))
+
+// Same card as ResultRow, with date + time on the left and the venue instead of a score.
+// The data-* hooks are filled by lib/render-match.ts.
+---
+<li class="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 border border-white/15 bg-white/6 p-5 sm:grid-cols-[9rem_1fr_minmax(0,14rem)] sm:gap-x-8">
+	<div class="flex flex-col gap-1.5">
+		<span data-date class="text-xs font-bold tracking-label text-white/55 uppercase">{fixture.dateLabel}</span>
+		<span data-time class="font-score text-2xl leading-none text-gold">{fixture.time}</span>
+	</div>
+	<div class="min-w-0 space-y-2">
+		{teams.map((team) => (
+			<div data-team class="flex min-w-0 items-center gap-3">
+				<TeamBadge name={team.name} isEagles={team.isEagles} />
+				<span data-name title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
+			</div>
+		))}
+	</div>
+	<p data-venue class="col-span-2 mt-3 text-xs text-white/60 sm:col-span-1 sm:mt-0">{fixture.venue}</p>
+</li>

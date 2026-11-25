@@ -1,5 +1,4 @@
 ---
-import type { GetStaticPaths } from "astro"
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { Image } from "astro:assets"
 import heroImage from "../../assets/images/team-heren-1.jpg"
@@ -9,16 +8,15 @@ import ArrowUpRight from "../../components/icons/ArrowUpRight.astro"
 import FixtureGroup from "../../components/FixtureGroup.astro"
 import Carousel from "../../components/Carousel.astro"
 import ResultCard from "../../components/ResultCard.astro"
-import { fetchPlans, formatPrice } from "../../lib/registration"
+import VenueMap from "../../components/VenueMap.astro"
 import FixtureCard from "../../components/FixtureCard.astro"
 import ResultCardSkeleton from "../../components/ResultCardSkeleton.astro"
 import FixtureGroupSkeleton from "../../components/FixtureGroupSkeleton.astro"
-import type { Match } from "../../lib/matches"
-import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+import { BLANK_FIXTURE, BLANK_RESULT } from "../../lib/matches"
+import { fetchClubLogos } from "../../lib/clubs"
+import { getHomeContent, getOutcomeLabels, localeStaticPaths, resolveLocale, useTranslations } from "../../i18n"
 
-// The default locale lives at "/", others at "/<locale>/".
-export const getStaticPaths = (() =>
-	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+export const getStaticPaths = localeStaticPaths
 
 const locale = resolveLocale(Astro.currentLocale)
 const t = useTranslations(locale)
@@ -28,28 +26,22 @@ const bcp47 = t("locale.bcp47")
 const RESULTS_LIMIT = 6
 const FIXTURES_LIMIT = 5
 
-const plans = await fetchPlans()
-
 // Results and fixtures are fetched in the browser (always up to date); skeletons show while they load.
 // Rows per date block in the fixtures skeleton (adds up to FIXTURES_LIMIT).
 const fixtureSkeletons = [2, 1, 2]
 
-// Empty instances used as <template>s by the client-side renderer.
-const blankMatch: Match = {
-	id: 0, date: "", dateLabel: "", time: "", home: "", away: "", homeIsUs: true, awayIsUs: false,
-	venue: "", played: true, homeScore: 0, awayScore: 0, outcome: "win",
-}
-const blankFixture = { time: "", home: "", away: "", venue: "" }
 const slideClass = "shrink-0 snap-start basis-full sm:basis-[calc((100%-1rem)/2)] lg:basis-[calc((100%-2rem)/3)]"
-const outcomeLabels = { win: t("outcome.win"), draw: t("outcome.draw"), loss: t("outcome.loss") }
+const clubLogos = await fetchClubLogos()
+const outcomeLabels = getOutcomeLabels(t)
 const messages = { error: t("matches.error"), noResults: t("matches.noResults"), noFixtures: t("matches.noFixtures") }
 
 const lines = (text: string) => text.split("\n")
+const ctaHref = (href: string) => (href.startsWith("#") ? href : getRelativeLocaleUrl(locale, href))
 ---
 <MainLayout title={content.meta.title} description={content.meta.description} current="home">
 	<main id="main" data-live-matches data-locale={bcp47} data-results-limit={RESULTS_LIMIT} data-fixtures-limit={FIXTURES_LIMIT} data-messages={JSON.stringify(messages)}>
 		<section class="relative flex min-h-[720px] items-end overflow-hidden bg-navy text-white">
-			<Image src={heroImage} alt="" width={2000} loading="eager" class="absolute inset-0 h-full w-full object-cover object-center opacity-40" />
+			<Image src={heroImage} alt="" width={2000} widths={[640, 1024, 1600, 2000]} sizes="100vw" quality={60} loading="eager" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover object-center opacity-40" />
 			<div class="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-navy/30"></div>
 			<div class="relative mx-auto w-full max-w-[1400px] px-5 pt-36 pb-16 sm:px-8 lg:px-12 lg:pb-20">
 				<div class="max-w-4xl">
@@ -59,14 +51,19 @@ const lines = (text: string) => text.split("\n")
 					<h1 class="w-full max-w-[850px] font-display text-[clamp(3.4rem,10vw,9rem)] leading-[0.78] font-extrabold tracking-[-0.045em] uppercase">
 						{content.hero.title}<br /><span class="whitespace-nowrap text-gold">{content.hero.titleHighlight}</span>
 					</h1>
-					<div class="mt-8 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+					<div class="mt-8 flex flex-wrap items-center gap-4">
 						<a
-							href={content.hero.cta.href}
+							href={ctaHref(content.hero.primaryCta.href)}
 							class="flex items-center gap-3 bg-gold px-6 py-4 text-xs font-extrabold tracking-label text-navy uppercase transition hover:bg-white"
 						>
-							{content.hero.cta.label} <ArrowRight />
+							{content.hero.primaryCta.label} <ArrowRight />
 						</a>
-						<p class="max-w-xs text-sm leading-6 text-white/70">{content.hero.intro}</p>
+						<a
+							href={ctaHref(content.hero.secondaryCta.href)}
+							class="flex items-center gap-3 border border-white/40 px-6 py-4 text-xs font-extrabold tracking-label text-white uppercase transition hover:border-gold hover:text-gold"
+						>
+							{content.hero.secondaryCta.label}
+						</a>
 					</div>
 				</div>
 			</div>
@@ -79,7 +76,7 @@ const lines = (text: string) => text.split("\n")
 						<p class="section-kicker text-gold">{content.results.kicker}</p>
 						<h2 class="section-title text-white">{content.results.title}</h2>
 					</div>
-					<a href="#results" class="link-arrow text-white hover:text-white">{content.results.linkLabel} <ArrowUpRight /></a>
+					<a href={getRelativeLocaleUrl(locale, "uitslagen")} class="link-arrow text-white hover:text-white">{content.results.linkLabel} <ArrowUpRight /></a>
 				</div>
 				<Carousel label={content.results.title} prevLabel={t("carousel.prev")} nextLabel={t("carousel.next")}>
 					{Array.from({ length: RESULTS_LIMIT }, () => (
@@ -87,8 +84,8 @@ const lines = (text: string) => text.split("\n")
 					))}
 				</Carousel>
 				<p data-results-status role="status" class="sr-only text-sm text-white/70">{t("matches.loading")}</p>
-				<template data-result-template data-outcome-labels={JSON.stringify(outcomeLabels)}>
-					<li class={slideClass}><ResultCard result={blankMatch} locale={locale} /></li>
+				<template data-result-template data-outcome-labels={JSON.stringify(outcomeLabels)} data-club-logos={JSON.stringify(clubLogos)}>
+					<li class={slideClass}><ResultCard result={BLANK_RESULT} locale={locale} /></li>
 				</template>
 			</div>
 		</section>
@@ -101,7 +98,7 @@ const lines = (text: string) => text.split("\n")
 						{lines(content.fixtures.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
 					</h2>
 					<p class="mt-5 max-w-sm text-sm leading-6 text-navy/75">{content.fixtures.intro}</p>
-					<a href="#fixtures" class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
+					<a href={getRelativeLocaleUrl(locale, "programma")} class="link-arrow mt-7">{content.fixtures.linkLabel} <ArrowRight /></a>
 				</div>
 				<div class="border-t border-navy/20">
 					<div data-fixture-groups>
@@ -110,34 +107,41 @@ const lines = (text: string) => text.split("\n")
 					<p data-fixtures-status role="status" class="sr-only py-5 text-sm text-navy/70">{t("matches.loading")}</p>
 				</div>
 				<template data-fixture-group-template><FixtureGroup date="" day="" month="" fixtures={[]} /></template>
-				<template data-fixture-template><FixtureCard fixture={blankFixture} /></template>
+				<template data-fixture-template><FixtureCard fixture={BLANK_FIXTURE} /></template>
 			</div>
 		</section>
 
-		<section id="join" class="bg-navy py-20 text-white sm:py-28">
+		<section id="contact" class="border-t border-navy/10 bg-paper-dim py-20 sm:py-28">
 			<div class="mx-auto grid max-w-[1400px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-12">
 				<div>
-					<p class="section-kicker text-gold">{content.join.kicker}</p>
-					<h2 class="section-title text-white">
-						{lines(content.join.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+					<p class="section-kicker">{content.contact.kicker}</p>
+					<h2 class="section-title">
+						{lines(content.contact.title).map((line, i) => (<>{i > 0 && <br />}{line}</>))}
 					</h2>
-					<p class="mt-5 max-w-sm text-sm leading-6 text-white/70">{content.join.teaser}</p>
+					<p class="mt-5 max-w-sm text-sm leading-6 text-navy/75">{content.contact.intro}</p>
 				</div>
 				<div class="max-w-3xl">
-					<ul class="border-t border-white/20">
-						{plans.map((plan) => (
-							<li class="flex items-center justify-between gap-4 border-b border-white/20 py-4">
-								<span class="font-semibold">{plan.name}</span>
-								<span class="font-score text-xl text-gold">{formatPrice(plan.price, t("locale.bcp47"))}</span>
-							</li>
-						))}
-					</ul>
+					<div class="grid gap-8 border-t border-navy/20 pt-6 sm:grid-cols-2">
+						<div>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/70 uppercase">{content.contact.postal.title}</h3>
+							<address class="text-sm leading-6 not-italic">
+								{content.contact.postal.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+							</address>
+						</div>
+						<div>
+							<h3 class="mb-3 text-xs font-extrabold tracking-label text-navy/70 uppercase">{content.contact.venue.title}</h3>
+							<address class="text-sm leading-6 not-italic">
+								{content.contact.venue.lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+							</address>
+						</div>
+					</div>
+					<VenueMap lon={content.contact.venue.lon} lat={content.contact.venue.lat} label={content.contact.venue.mapTitle} class="mt-8" />
 					<a
-						href={getRelativeLocaleUrl(locale, "inschrijven")}
-						class="mt-8 inline-flex items-center gap-3 bg-gold px-6 py-4 text-xs font-extrabold tracking-label text-navy uppercase transition hover:bg-white hover:text-navy"
-					>
-						{content.join.cta} <ArrowRight />
-					</a>
+						href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(content.contact.venue.mapQuery)}`}
+						target="_blank"
+						rel="noopener"
+						class="link-arrow mt-5"
+					>{content.contact.venue.mapLinkLabel} <span class="sr-only">{t("link.newTab")}</span> <ArrowUpRight /></a>
 				</div>
 			</div>
 		</section>
@@ -145,57 +149,30 @@ const lines = (text: string) => text.split("\n")
 </MainLayout>
 
 <script>
-	import { fetchMatches, groupByDay, initials, OUTCOME_CLASSES, selectResults, selectSchedule, shortenName, type FixtureDay, type Match } from "../../lib/matches"
+	import { fetchMatches, groupByDay, selectResults, selectSchedule, shortenName, type FixtureDay } from "../../lib/matches"
+	import { renderResult } from "../../lib/render-match"
+	import { $, cloneTemplate, readJson, showItems } from "../../lib/dom"
+	import type { ClubLogos } from "../../lib/clubs"
 
-	const root = document.querySelector<HTMLElement>("[data-live-matches]")!
+	const root = $(document, "[data-live-matches]")
 	const { locale, resultsLimit, fixturesLimit } = root.dataset
-	const messages: Record<"error" | "noResults" | "noFixtures", string> = JSON.parse(root.dataset.messages!)
+	const messages = readJson<Record<"error" | "noResults" | "noFixtures", string>>(root, "messages")
 
-	const resultTemplate = root.querySelector<HTMLTemplateElement>("[data-result-template]")!
-	const outcomeLabels: Record<string, string> = JSON.parse(resultTemplate.dataset.outcomeLabels!)
-	const allOutcomeClasses = Object.values(OUTCOME_CLASSES).flatMap((c) => c.split(" "))
-	const groupTemplate = root.querySelector<HTMLTemplateElement>("[data-fixture-group-template]")!
-	const fixtureTemplate = root.querySelector<HTMLTemplateElement>("[data-fixture-template]")!
+	const resultTemplate = $<HTMLTemplateElement>(root, "[data-result-template]")
+	const outcomeLabels = readJson<Record<string, string>>(resultTemplate, "outcomeLabels")
+	const clubLogos = readJson<ClubLogos>(resultTemplate, "clubLogos")
+	const groupTemplate = $<HTMLTemplateElement>(root, "[data-fixture-group-template]")
+	const fixtureTemplate = $<HTMLTemplateElement>(root, "[data-fixture-template]")
 
-	const clone = (template: HTMLTemplateElement) => template.content.firstElementChild!.cloneNode(true) as HTMLElement
-	const $ = (el: ParentNode, selector: string) => el.querySelector<HTMLElement>(selector)!
-
-	function renderResult(match: Match) {
-		const slide = clone(resultTemplate)
-		$(slide, "[data-date]").textContent = match.dateLabel
-		const teams = [
-			{ name: match.home, score: match.homeScore, isUs: match.homeIsUs },
-			{ name: match.away, score: match.awayScore, isUs: match.awayIsUs },
-		]
-		slide.querySelectorAll<HTMLElement>("[data-team]").forEach((row, i) => {
-			const team = teams[i]
-			$(row, "[data-logo]").hidden = !team.isUs
-			const badge = $(row, "[data-initials]")
-			badge.hidden = team.isUs
-			badge.textContent = initials(team.name)
-			const name = $(row, "[data-name]")
-			name.textContent = shortenName(team.name)
-			name.title = team.name
-			name.classList.toggle("text-white/75", !team.isUs)
-			const score = $(row, "[data-score]")
-			score.textContent = String(team.score)
-			score.classList.toggle("text-white/65", !team.isUs)
-		})
-		const outcome = $(slide, "[data-outcome]")
-		outcome.classList.remove(...allOutcomeClasses)
-		outcome.classList.add(...OUTCOME_CLASSES[match.outcome!].split(" "))
-		outcome.textContent = outcomeLabels[match.outcome!]
-		return slide
-	}
-
+	/** One date block (FixtureGroup) with a FixtureCard per match. */
 	function renderFixtureDay(day: FixtureDay) {
-		const group = clone(groupTemplate)
+		const group = cloneTemplate(groupTemplate)
 		$(group, "[data-date]").setAttribute("datetime", day.date)
 		$(group, "[data-day]").textContent = day.day
 		$(group, "[data-month]").textContent = day.month
 		$(group, "[data-fixtures]").replaceChildren(
 			...day.fixtures.map((fixture) => {
-				const card = clone(fixtureTemplate)
+				const card = cloneTemplate(fixtureTemplate)
 				$(card, "[data-time]").textContent = fixture.time
 				card.querySelectorAll<HTMLElement>("[data-team]").forEach((el, i) => {
 					const name = i === 0 ? fixture.home : fixture.away
@@ -214,24 +191,16 @@ const lines = (text: string) => text.split("\n")
 	const fixtureGroups = $(root, "[data-fixture-groups]")
 	const fixturesStatus = $(root, "[data-fixtures-status]")
 
-	/** Swaps the skeletons for content, or for a visible message when there is none. */
-	function show(container: HTMLElement, status: HTMLElement, items: HTMLElement[], emptyMessage: string) {
-		container.replaceChildren(...items)
-		container.hidden = items.length === 0
-		status.textContent = items.length === 0 ? emptyMessage : ""
-		status.classList.toggle("sr-only", items.length > 0)
-	}
-
 	fetchMatches(locale)
 		.then((matches) => {
 			const results = selectResults(matches, Number(resultsLimit))
-			show(resultsTrack, resultsStatus, results.map(renderResult), messages.noResults)
+			showItems(resultsTrack, resultsStatus, results.map((match) => renderResult(resultTemplate, outcomeLabels, match, clubLogos)), messages.noResults)
 			const days = groupByDay(selectSchedule(matches, Number(fixturesLimit)), locale)
-			show(fixtureGroups, fixturesStatus, days.map(renderFixtureDay), messages.noFixtures)
+			showItems(fixtureGroups, fixturesStatus, days.map(renderFixtureDay), messages.noFixtures)
 		})
 		.catch((error) => {
 			console.warn("Could not load matches", error)
-			show(resultsTrack, resultsStatus, [], messages.error)
-			show(fixtureGroups, fixturesStatus, [], messages.error)
+			showItems(resultsTrack, resultsStatus, [], messages.error)
+			showItems(fixtureGroups, fixturesStatus, [], messages.error)
 		})
 </script>

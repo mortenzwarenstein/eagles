@@ -1,5 +1,6 @@
 ---
 import Logo from "../assets/images/eag_logo.png"
+import { Image } from "astro:assets"
 
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { locales, localizedPathname, useTranslations, type Locale } from "../i18n"
@@ -7,7 +8,7 @@ import { locales, localizedPathname, useTranslations, type Locale } from "../i18
 interface Props {
     variant?: "home" | "page"
     /** Nav item that represents the current page */
-    current?: "home" | "join"
+    current?: "home" | "results" | "fixtures" | "join" | "contact"
     locale: Locale
 }
 
@@ -16,14 +17,12 @@ const t = useTranslations(locale)
 const isHome = variant === "home"
 
 const homeUrl = getRelativeLocaleUrl(locale)
-const prefix = isHome ? "" : homeUrl
 const navItems = [
-    { label: t("nav.home"), href: homeUrl, current: current === "home", section: "home" },
-    { label: t("nav.results"), href: `${prefix}#results`, current: false, section: "results" },
-    { label: t("nav.fixtures"), href: `${prefix}#fixtures`, current: false, section: "fixtures" },
-    current === "join"
-        ? { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: true, section: "join" }
-        : { label: t("nav.join"), href: `${prefix}#join`, current: false, section: "join" },
+    { label: t("nav.home"), href: homeUrl, current: current === "home" },
+    { label: t("nav.results"), href: getRelativeLocaleUrl(locale, "uitslagen"), current: current === "results" },
+    { label: t("nav.fixtures"), href: getRelativeLocaleUrl(locale, "programma"), current: current === "fixtures" },
+    { label: t("nav.join"), href: getRelativeLocaleUrl(locale, "inschrijven"), current: current === "join" },
+    { label: t("nav.contact"), href: getRelativeLocaleUrl(locale, "contact"), current: current === "contact" },
 ]
 const otherLocales = locales
     .filter((l) => l !== locale)
@@ -38,7 +37,7 @@ const otherLocales = locales
     <div class="mx-auto flex h-20 max-w-350 items-center justify-between px-5 sm:px-8 lg:px-12">
         <a href={isHome ? "#main" : homeUrl} class="flex items-center gap-3" aria-label={t("header.homeLabel")}>
             <span class="flex size-14 shrink-0 items-center justify-center rounded-full bg-white p-2">
-                <img src={Logo.src} alt={t("header.logoAlt")} class="size-full object-contain" />
+                <Image src={Logo} width={112} alt={t("header.logoAlt")} class="size-full object-contain" />
             </span>
             <span class="font-display text-xl leading-none font-bold tracking-[0.06em] text-gold uppercase">
                 UBV<br />The Eagles
@@ -52,7 +51,6 @@ const otherLocales = locales
             {navItems.map((item) => (
                 <a
                     href={item.href}
-                    data-nav-section={isHome ? item.section : undefined}
                     aria-current={item.current ? "page" : undefined}
                     class="border-b border-transparent py-2 text-xs font-bold tracking-[0.15em] text-white/80 uppercase transition hover:text-gold aria-[current=page]:border-gold aria-[current=page]:text-gold"
                 >
@@ -97,7 +95,7 @@ const otherLocales = locales
     >
         <div class="flex flex-col gap-5">
             {navItems.map((item) => (
-                <a href={item.href} data-nav-section={isHome ? item.section : undefined} aria-current={item.current ? "page" : undefined} class="w-fit border-b-2 border-transparent font-display text-2xl font-bold text-white uppercase aria-[current=page]:border-gold aria-[current=page]:text-gold">{item.label}</a>
+                <a href={item.href} aria-current={item.current ? "page" : undefined} class="w-fit border-b-2 border-transparent font-display text-2xl font-bold text-white uppercase aria-[current=page]:border-gold aria-[current=page]:text-gold">{item.label}</a>
             ))}
             {otherLocales.map((l) => (
                 <a href={l.href} hreflang={l.code} lang={l.code} class="font-display text-2xl font-bold text-white/60 uppercase">{l.name}</a>
@@ -111,32 +109,6 @@ const otherLocales = locales
     const syncScrolled = () => header?.toggleAttribute("data-scrolled", window.scrollY > 8)
     syncScrolled()
     window.addEventListener("scroll", syncScrolled, { passive: true })
-
-    // Scroll spy: mark the nav link of the section currently in view (home page only)
-    const navLinks = document.querySelectorAll<HTMLAnchorElement>("[data-nav-section]")
-    const sections = [...new Set([...navLinks].map((a) => a.dataset.navSection!))]
-        .map((id) => document.getElementById(id))
-        .filter((el): el is HTMLElement => el !== null)
-    const syncCurrent = () => {
-        const line = (header?.offsetHeight ?? 80) + 40
-        const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
-        let active = "home"
-        for (const el of sections) if (el.getBoundingClientRect().top <= line) active = el.id
-        if (atBottom && sections.length) active = sections[sections.length - 1].id
-        for (const a of navLinks) {
-            if (a.dataset.navSection === active) a.setAttribute("aria-current", "page")
-            else a.removeAttribute("aria-current")
-        }
-        const hash = active === "home" ? "" : `#${active}`
-        if (location.hash !== hash) {
-            history.replaceState(null, "", location.pathname + location.search + hash)
-        }
-    }
-    if (navLinks.length) {
-        syncCurrent()
-        window.addEventListener("scroll", syncCurrent, { passive: true })
-        window.addEventListener("resize", syncCurrent)
-    }
 
     const toggle = document.querySelector<HTMLButtonElement>("#nav-toggle")
     const mobileNav = document.querySelector<HTMLElement>("#mobile-nav")

@@ -1,0 +1,28 @@
+---
+import Logo from "../assets/images/eag_logo.png"
+import { Image } from "astro:assets"
+import { initials } from "../lib/matches"
+
+interface Props {
+	name: string
+	isEagles: boolean
+	size?: "sm" | "md"
+}
+
+const { name, isEagles, size = "sm" } = Astro.props
+const sizeClass = size === "md" ? "size-7" : "size-6"
+
+// Our own logo, an opponent's club logo, or their initials. Exactly one shows; lib/render-match.ts
+// switches between them via the data-* hooks.
+---
+<span data-logo hidden={!isEagles} class:list={[sizeClass, "flex shrink-0 items-center justify-center rounded-full bg-white p-1"]}>
+	<Image src={Logo} width={96} alt="" class="size-full object-contain" />
+</span>
+<img data-club-logo hidden alt="" loading="lazy" decoding="async" width="28" height="28" class:list={[sizeClass, "shrink-0 rounded-full bg-white object-contain p-0.5"]} />
+<span
+	data-initials
+	hidden={isEagles}
+	class:list={[sizeClass, size === "md" ? "text-xs" : "text-[0.65rem]", "flex shrink-0 items-center justify-center rounded-full border border-white/25 font-bold text-white/60"]}
+>
+	{initials(name)}
+</span>

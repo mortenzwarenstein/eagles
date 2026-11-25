@@ -1,7 +1,7 @@
 ---
-import Logo from "../assets/images/eag_logo.png"
+import TeamBadge from "./TeamBadge.astro"
 
-import { initials, OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
+import { OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
 import { useTranslations, type Locale } from "../i18n"
 
 interface Props {
@@ -15,9 +15,9 @@ const t = useTranslations(locale)
 const teams = [
 	{ name: result.home, score: result.homeScore, isEagles: result.homeIsUs },
 	{ name: result.away, score: result.awayScore, isEagles: result.awayIsUs },
-].map((team) => ({ ...team, shortName: shortenName(team.name), initials: initials(team.name) }))
+].map((team) => ({ ...team, shortName: shortenName(team.name) }))
 
-// The data-* hooks are used by the client-side refresh on the home page.
+// The data-* hooks are used by the client-side renderer (lib/render-match.ts).
 ---
 <article class="group flex h-full w-full flex-col border border-white/15 bg-white/6 p-5 transition hover:bg-white/10">
 	<div class="mb-8 flex items-start justify-between gap-4 text-xs font-bold tracking-label text-white/55 uppercase">
@@ -27,16 +27,7 @@ const teams = [
 		{teams.map((team) => (
 			<div data-team class="flex items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-3">
-					<span data-logo hidden={!team.isEagles} class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white p-1">
-						<img src={Logo.src} alt="" class="size-full object-contain" />
-					</span>
-					<span
-						data-initials
-						hidden={team.isEagles}
-						class="flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-bold text-white/60"
-					>
-						{team.initials}
-					</span>
+					<TeamBadge name={team.name} isEagles={team.isEagles} size="md" />
 					<span data-name title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
 				</div>
 				{result.played && <span data-score class:list={["font-score text-3xl", !team.isEagles && "text-white/65"]}>{team.score}</span>}

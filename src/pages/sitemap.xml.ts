@@ -6,7 +6,10 @@ import type { APIRoute } from "astro"
  */
 const PAGES: [nl: string, en: string][] = [
 	["/", "/en/"],
+	["/uitslagen/", "/en/uitslagen/"],
+	["/programma/", "/en/programma/"],
 	["/inschrijven/", "/en/inschrijven/"],
+	["/contact/", "/en/contact/"],
 ]
 
 export const GET: APIRoute = ({ site }) => {
