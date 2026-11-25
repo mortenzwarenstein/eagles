@@ -1,8 +1,7 @@
 ---
-import Logo from "../assets/images/eag_logo.png"
-import { Image } from "astro:assets"
+import TeamBadge from "./TeamBadge.astro"
 
-import { initials, OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
+import { OUTCOME_CLASSES, shortenName, type Match } from "../lib/matches"
 import { useTranslations, type Locale } from "../i18n"
 
 interface Props {
@@ -16,9 +15,9 @@ const t = useTranslations(locale)
 const teams = [
 	{ name: result.home, score: result.homeScore, isEagles: result.homeIsUs },
 	{ name: result.away, score: result.awayScore, isEagles: result.awayIsUs },
-].map((team) => ({ ...team, shortName: shortenName(team.name, 32), initials: initials(team.name) }))
+].map((team) => ({ ...team, shortName: shortenName(team.name, 32) }))
 
-// Full-width variant of ResultCard: same data-* hooks, so lib/render-result.ts fills both.
+// Full-width variant of ResultCard: same data-* hooks, so lib/render-match.ts fills both.
 ---
 <li class="grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-4 border border-white/15 bg-white/6 p-5 sm:grid-cols-[9rem_1fr_auto] sm:gap-x-8">
 	<span data-date class="text-xs font-bold tracking-label text-white/55 uppercase">{result.dateLabel}</span>
@@ -26,16 +25,7 @@ const teams = [
 		{teams.map((team) => (
 			<div data-team class="flex items-center justify-between gap-4">
 				<div class="flex min-w-0 items-center gap-3">
-					<span data-logo hidden={!team.isEagles} class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white p-1">
-						<Image src={Logo} width={96} alt="" class="size-full object-contain" />
-					</span>
-					<span
-						data-initials
-						hidden={team.isEagles}
-						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-white/25 text-[0.65rem] font-bold text-white/60"
-					>
-						{team.initials}
-					</span>
+					<TeamBadge name={team.name} isEagles={team.isEagles} />
 					<span data-name title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
 				</div>
 				<span data-score class:list={["font-score text-2xl", !team.isEagles && "text-white/65"]}>{team.score}</span>

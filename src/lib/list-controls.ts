@@ -1,11 +1,15 @@
 /** Client-side controls shared by the paginated, team-filterable match lists (results and schedule). */
+import { $, readJson, showItems } from "./dom"
+import { fetchMatches, ourTeam, type Match } from "./matches"
+
+export const MATCH_LIST_PAGE_SIZE = 12
 
 /**
  * Accessible custom dropdown (button + listbox) inside `root`, which needs the
  * `data-select-button`, `data-select-label` and `data-select-list` hooks.
  * Calls `onChange` with the chosen value.
  */
-export function createSelect(
+function createSelect(
 	root: ParentNode,
 	options: { value: string; label: string }[],
 	initial: string,
@@ -89,7 +93,7 @@ export function createSelect(
 	sync()
 }
 
-export interface PaginationLabels {
+interface PaginationLabels {
 	label: string
 	prev: string
 	next: string
@@ -112,7 +116,7 @@ function pageButton(label: string, text: string, onClick: () => void, disabled =
 }
 
 /** Fills `nav` with prev / numbered / next buttons; hidden when there is only one page. */
-export function renderPagination(nav: HTMLElement, labels: PaginationLabels, page: number, pages: number, goTo: (page: number) => void) {
+function renderPagination(nav: HTMLElement, labels: PaginationLabels, page: number, pages: number, goTo: (page: number) => void) {
 	nav.replaceChildren(
 		pageButton(labels.prev, "←", () => goTo(page - 1), page === 1),
 		...Array.from({ length: pages }, (_, i) => pageButton(`${labels.page} ${i + 1}`, String(i + 1), () => goTo(i + 1), false, i + 1 === page)),
@@ -122,7 +126,7 @@ export function renderPagination(nav: HTMLElement, labels: PaginationLabels, pag
 }
 
 /** Mirrors the page and team into the query string (without adding history entries). */
-export function syncUrl(page: number, team: string) {
+function syncUrl(page: number, team: string) {
 	const url = new URL(location.href)
 	if (page === 1) url.searchParams.delete("page")
 	else url.searchParams.set("page", String(page))
@@ -132,7 +136,52 @@ export function syncUrl(page: number, team: string) {
 }
 
 /** Scrolls `el` into view, without animation for visitors who prefer reduced motion. */
-export function scrollToTop(el: HTMLElement) {
+function scrollToTop(el: HTMLElement) {
 	const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
 	el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })
+}
+
+/**
+ * Fetches the matches and runs a MatchList component (`root`): team filter, pagination and the
+ * page/team query string. `select` picks the matches to list, `renderItem` turns one into an element.
+ */
+export function loadMatchList(root: HTMLElement, select: (matches: Match[]) => Match[], renderItem: (match: Match) => HTMLElement) {
+	const messages = readJson<{ error: string; empty: string }>(root, "messages")
+	const labels = readJson<PaginationLabels>(root, "pagination")
+	const pageSize = Number(root.dataset.pageSize)
+	const list = $(root, "[data-items]")
+	const status = $(root, "[data-status]")
+	const nav = $(root, "nav[data-pagination]")
+	const filter = $(root, "[data-filter]")
+	const params = new URLSearchParams(location.search)
+
+	function init(all: Match[]) {
+		const teams = [...new Set(all.map(ourTeam))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+		filter.hidden = teams.length < 2
+		let team = teams.includes(params.get("team") ?? "") ? params.get("team")! : ""
+
+		function render(page: number, moved: boolean) {
+			const matches = team ? all.filter((match) => ourTeam(match) === team) : all
+			const pages = Math.max(1, Math.ceil(matches.length / pageSize))
+			page = Math.min(Math.max(1, page), pages)
+			showItems(list, status, matches.slice((page - 1) * pageSize, page * pageSize).map(renderItem), messages.empty)
+			renderPagination(nav, labels, page, pages, (next) => render(next, true))
+			syncUrl(page, team)
+			if (moved) scrollToTop(root)
+		}
+
+		const options = [{ value: "", label: root.dataset.allTeams! }, ...teams.map((name) => ({ value: name, label: name }))]
+		createSelect(filter, options, team, (value) => {
+			team = value
+			render(1, false)
+		})
+		render(Number(params.get("page")) || 1, false)
+	}
+
+	fetchMatches(root.dataset.locale)
+		.then((matches) => init(select(matches)))
+		.catch((error) => {
+			console.warn("Could not load matches", error)
+			showItems(list, status, [], messages.error)
+		})
 }

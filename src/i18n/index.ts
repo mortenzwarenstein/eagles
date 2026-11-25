@@ -1,3 +1,4 @@
+import type { GetStaticPaths } from "astro"
 import { getEntry } from "astro:content"
 import { getRelativeLocaleUrl } from "astro:i18n"
 import { ui } from "./ui"
@@ -8,12 +9,23 @@ export const defaultLocale: Locale = "nl"
 
 export const isLocale = (value: unknown): value is Locale => typeof value === "string" && value in ui
 
+/** `getStaticPaths` for `[...locale]` pages: the default locale lives at "/", others at "/<locale>/". */
+export const localeStaticPaths = (() =>
+	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+
 /** Resolve the locale from `Astro.currentLocale`, falling back to the default. */
 export const resolveLocale = (value: string | undefined): Locale => (isLocale(value) ? value : defaultLocale)
 
 export function useTranslations(locale: Locale) {
 	return (key: keyof (typeof ui)[typeof defaultLocale]) => ui[locale][key] ?? ui[defaultLocale][key]
 }
+
+/** Translated labels per match outcome, for the client-side result renderer. */
+export const getOutcomeLabels = (t: ReturnType<typeof useTranslations>) => ({
+	win: t("outcome.win"),
+	draw: t("outcome.draw"),
+	loss: t("outcome.loss"),
+})
 
 /** Localised page content, falling back to the default locale when a translation is missing. */
 export async function getHomeContent(locale: Locale) {
