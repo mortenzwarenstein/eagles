@@ -1,0 +1,59 @@
+---
+import { MATCH_LIST_PAGE_SIZE } from "../lib/list-controls"
+import { useTranslations, type Locale } from "../i18n"
+
+interface Props {
+	locale: Locale
+	/** Shown when the (filtered) list has no matches. */
+	emptyMessage: string
+}
+
+const { locale, emptyMessage } = Astro.props
+const t = useTranslations(locale)
+
+const messages = { error: t("matches.error"), empty: emptyMessage }
+const pagination = { label: t("pagination.label"), prev: t("pagination.prev"), next: t("pagination.next"), page: t("pagination.page") }
+
+// Paginated, team-filterable list of matches, filled in the browser by loadMatchList() (lib/list-controls.ts).
+// Default slot: the loading skeletons. "template" slot: a <template data-item-template> with one blank item.
+---
+<div
+	data-match-list
+	data-locale={t("locale.bcp47")}
+	data-messages={JSON.stringify(messages)}
+	data-pagination={JSON.stringify(pagination)}
+	data-page-size={MATCH_LIST_PAGE_SIZE}
+	data-all-teams={t("filter.allTeams")}
+>
+	<div data-filter hidden class="mb-6 flex items-center gap-4">
+		<label id="team-filter-label" for="team-filter" class="text-xs font-bold tracking-label text-white/55 uppercase">{t("filter.team")}</label>
+		<div data-select class="relative">
+			<button
+				type="button"
+				id="team-filter"
+				data-select-button
+				aria-haspopup="listbox"
+				aria-expanded="false"
+				class="flex min-w-56 items-center justify-between gap-6 border border-white/25 bg-navy py-3 pr-4 pl-4 text-left text-sm font-semibold text-white transition hover:border-gold aria-expanded:border-gold"
+			>
+				<span data-select-label class="truncate">{t("filter.allTeams")}</span>
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-gold transition-transform in-aria-expanded:rotate-180">
+					<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+				</svg>
+			</button>
+			<ul
+				data-select-list
+				role="listbox"
+				tabindex="-1"
+				hidden
+				aria-labelledby="team-filter-label"
+				class="absolute top-full left-0 z-10 mt-1 max-h-72 min-w-full overflow-auto border border-white/25 bg-navy shadow-card focus:outline-none"
+			></ul>
+		</div>
+	</div>
+
+	<ul data-items class="grid gap-4"><slot /></ul>
+	<p data-status role="status" class="sr-only text-sm text-white/70">{t("matches.loading")}</p>
+	<nav data-pagination hidden aria-label={pagination.label} class="mt-10 flex flex-wrap items-center gap-2"></nav>
+	<slot name="template" />
+</div>

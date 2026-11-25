@@ -1,8 +1,7 @@
 ---
-import Logo from "../assets/images/eag_logo.png"
-import { Image } from "astro:assets"
+import TeamBadge from "./TeamBadge.astro"
 
-import { initials, shortenName, type Match } from "../lib/matches"
+import { shortenName, type Match } from "../lib/matches"
 
 interface Props {
 	fixture: Match
@@ -13,10 +12,10 @@ const { fixture } = Astro.props
 const teams = [
 	{ name: fixture.home, isEagles: fixture.homeIsUs },
 	{ name: fixture.away, isEagles: fixture.awayIsUs },
-].map((team) => ({ ...team, shortName: shortenName(team.name, 32), initials: initials(team.name) }))
+].map((team) => ({ ...team, shortName: shortenName(team.name, 32) }))
 
 // Same card as ResultRow, with date + time on the left and the venue instead of a score.
-// The data-* hooks are filled by lib/render-fixture.ts.
+// The data-* hooks are filled by lib/render-match.ts.
 ---
 <li class="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 border border-white/15 bg-white/6 p-5 sm:grid-cols-[9rem_1fr_minmax(0,14rem)] sm:gap-x-8">
 	<div class="flex flex-col gap-1.5">
@@ -26,16 +25,7 @@ const teams = [
 	<div class="min-w-0 space-y-2">
 		{teams.map((team) => (
 			<div data-team class="flex min-w-0 items-center gap-3">
-				<span data-logo hidden={!team.isEagles} class="flex size-6 shrink-0 items-center justify-center rounded-full bg-white p-1">
-					<Image src={Logo} width={96} alt="" class="size-full object-contain" />
-				</span>
-				<span
-					data-initials
-					hidden={team.isEagles}
-					class="flex size-6 shrink-0 items-center justify-center rounded-full border border-white/25 text-[0.65rem] font-bold text-white/60"
-				>
-					{team.initials}
-				</span>
+				<TeamBadge name={team.name} isEagles={team.isEagles} />
 				<span data-name title={team.name} class:list={["min-w-0 truncate font-semibold", !team.isEagles && "text-white/75"]}>{team.shortName}</span>
 			</div>
 		))}

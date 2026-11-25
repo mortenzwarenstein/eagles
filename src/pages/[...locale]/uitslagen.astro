@@ -1,140 +1,52 @@
 ---
-import type { GetStaticPaths } from "astro"
 import MainLayout from "../../layouts/main.astro"
+import MatchList from "../../components/MatchList.astro"
 import ResultRow from "../../components/ResultRow.astro"
 import ResultRowSkeleton from "../../components/ResultRowSkeleton.astro"
-import type { Match } from "../../lib/matches"
-import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+import { fetchClubLogos } from "../../lib/clubs"
+import { MATCH_LIST_PAGE_SIZE } from "../../lib/list-controls"
+import { BLANK_RESULT } from "../../lib/matches"
+import { getHomeContent, getOutcomeLabels, localeStaticPaths, resolveLocale, useTranslations } from "../../i18n"
 
-export const getStaticPaths = (() =>
-	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+export const getStaticPaths = localeStaticPaths
 
 const locale = resolveLocale(Astro.currentLocale)
 const t = useTranslations(locale)
 const { results } = await getHomeContent(locale)
 const page = results.page
 
-const SKELETONS = 12
-
 // Results are fetched in the browser (always up to date); skeletons show while they load.
-// An empty instance used as <template> by the client-side renderer.
-const blankMatch: Match = {
-	id: 0, date: "", dateLabel: "", time: "", home: "", away: "", homeIsUs: true, awayIsUs: false,
-	venue: "", played: true, homeScore: 0, awayScore: 0, outcome: "win",
-}
-const outcomeLabels = { win: t("outcome.win"), draw: t("outcome.draw"), loss: t("outcome.loss") }
-const messages = { error: t("matches.error"), noResults: t("matches.noResults") }
-const pagination = { label: t("pagination.label"), prev: t("pagination.prev"), next: t("pagination.next"), page: t("pagination.page") }
-const filterLabels = { team: t("filter.team"), all: t("filter.allTeams") }
-const PAGE_SIZE = 12
+const clubLogos = await fetchClubLogos()
 ---
 <MainLayout title={page.metaTitle} description={page.metaDescription} headerVariant="page" current="results">
-	<main id="main" data-live-results data-locale={t("locale.bcp47")} data-messages={JSON.stringify(messages)} data-pagination={JSON.stringify(pagination)} data-page-size={PAGE_SIZE} data-all-teams={filterLabels.all} class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
+	<main id="main" class="bg-navy pt-32 pb-16 text-white sm:pt-40 sm:pb-24">
 		<div class="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
 			<div class="mb-12">
-				<div>
-					<h1 class="section-title mt-0 text-white">{page.pageTitle}</h1>
-					<p class="mt-5 text-sm leading-6 text-white/70">{page.pageIntro}</p>
-				</div>
+				<h1 class="section-title mt-0 text-white">{page.pageTitle}</h1>
+				<p class="mt-5 text-sm leading-6 text-white/70">{page.pageIntro}</p>
 			</div>
 
-			<div data-filter hidden class="mb-6 flex items-center gap-4">
-				<label id="team-filter-label" for="team-filter" class="text-xs font-bold tracking-label text-white/55 uppercase">{filterLabels.team}</label>
-				<div data-select class="relative">
-					<button
-						type="button"
-						id="team-filter"
-						data-select-button
-						aria-haspopup="listbox"
-						aria-expanded="false"
-						class="flex min-w-56 items-center justify-between gap-6 border border-white/25 bg-navy py-3 pr-4 pl-4 text-left text-sm font-semibold text-white transition hover:border-gold aria-expanded:border-gold"
-					>
-						<span data-select-label class="truncate">{filterLabels.all}</span>
-						<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 text-gold transition-transform in-aria-expanded:rotate-180">
-							<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-					</button>
-					<ul
-						data-select-list
-						role="listbox"
-						tabindex="-1"
-						hidden
-						aria-labelledby="team-filter-label"
-						class="absolute top-full left-0 z-10 mt-1 max-h-72 min-w-full overflow-auto border border-white/25 bg-navy shadow-card focus:outline-none"
-					></ul>
-				</div>
-			</div>
-
-			<ul data-results class="grid gap-4">
-				{Array.from({ length: SKELETONS }, () => <ResultRowSkeleton />)}
-			</ul>
-			<p data-results-status role="status" class="sr-only text-sm text-white/70">{t("matches.loading")}</p>
-			<nav data-pagination hidden aria-label={pagination.label} class="mt-10 flex flex-wrap items-center gap-2"></nav>
-			<template data-result-template data-outcome-labels={JSON.stringify(outcomeLabels)}>
-				<ResultRow result={blankMatch} locale={locale} />
-			</template>
+			<MatchList locale={locale} emptyMessage={t("matches.noResults")}>
+				{Array.from({ length: MATCH_LIST_PAGE_SIZE }, () => <ResultRowSkeleton />)}
+				<template slot="template" data-item-template data-outcome-labels={JSON.stringify(getOutcomeLabels(t))} data-club-logos={JSON.stringify(clubLogos)}>
+					<ResultRow result={BLANK_RESULT} locale={locale} />
+				</template>
+			</MatchList>
 		</div>
 	</main>
 </MainLayout>
 
 <script>
-	import { fetchMatches, ourTeam, selectResults, type Match } from "../../lib/matches"
-	import { renderResult } from "../../lib/render-result"
-	import { createSelect, renderPagination, scrollToTop, syncUrl, type PaginationLabels } from "../../lib/list-controls"
+	import type { ClubLogos } from "../../lib/clubs"
+	import { $, readJson } from "../../lib/dom"
+	import { loadMatchList } from "../../lib/list-controls"
+	import { selectResults } from "../../lib/matches"
+	import { renderResult } from "../../lib/render-match"
 
-	const root = document.querySelector<HTMLElement>("[data-live-results]")!
-	const messages: Record<"error" | "noResults", string> = JSON.parse(root.dataset.messages!)
-	const template = root.querySelector<HTMLTemplateElement>("[data-result-template]")!
-	const outcomeLabels: Record<string, string> = JSON.parse(template.dataset.outcomeLabels!)
-	const list = root.querySelector<HTMLElement>("[data-results]")!
-	const status = root.querySelector<HTMLElement>("[data-results-status]")!
+	const root = $(document, "[data-match-list]")
+	const template = $<HTMLTemplateElement>(root, "[data-item-template]")
+	const outcomeLabels = readJson<Record<string, string>>(template, "outcomeLabels")
+	const clubLogos = readJson<ClubLogos>(template, "clubLogos")
 
-	const pagination: PaginationLabels = JSON.parse(root.dataset.pagination!)
-	const pageSize = Number(root.dataset.pageSize)
-	const nav = root.querySelector<HTMLElement>("nav[data-pagination]")!
-	const filter = root.querySelector<HTMLElement>("[data-filter]")!
-	const allTeamsLabel = root.dataset.allTeams!
-
-	/** Swaps the skeletons for content, or for a visible message when there is none. */
-	function show(items: HTMLElement[], emptyMessage: string) {
-		list.replaceChildren(...items)
-		list.hidden = items.length === 0
-		status.textContent = items.length === 0 ? emptyMessage : ""
-		status.classList.toggle("sr-only", items.length > 0)
-	}
-
-	const params = new URLSearchParams(location.search)
-
-	function init(all: Match[]) {
-		const teams = [...new Set(all.map(ourTeam))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-		filter.hidden = teams.length < 2
-
-		let team = teams.includes(params.get("team") ?? "") ? params.get("team")! : ""
-
-		function render(page: number, moved: boolean) {
-			const results = team ? all.filter((match) => ourTeam(match) === team) : all
-			const pages = Math.max(1, Math.ceil(results.length / pageSize))
-			page = Math.min(Math.max(1, page), pages)
-			const slice = results.slice((page - 1) * pageSize, page * pageSize)
-			show(slice.map((match) => renderResult(template, outcomeLabels, match)), messages.noResults)
-			renderPagination(nav, pagination, page, pages, (next) => render(next, true))
-			syncUrl(page, team)
-			if (moved) scrollToTop(root)
-		}
-
-		createSelect(filter, [{ value: "", label: allTeamsLabel }, ...teams.map((name) => ({ value: name, label: name }))], team, (value) => {
-			team = value
-			render(1, false)
-		})
-		render(Number(params.get("page")) || 1, false)
-	}
-
-	fetchMatches(root.dataset.locale)
-		.then((matches) => {
-			init(selectResults(matches))
-		})
-		.catch((error) => {
-			console.warn("Could not load results", error)
-			show([], messages.error)
-		})
+	loadMatchList(root, (matches) => selectResults(matches), (match) => renderResult(template, outcomeLabels, match, clubLogos))
 </script>

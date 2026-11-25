@@ -15,8 +15,9 @@ const home = defineCollection({
 			kicker: z.string(),
 			title: z.string(),
 			titleHighlight: z.string(),
-			cta: z.object({ label: z.string(), href: z.string() }),
-			intro: z.string(),
+			/** `href` is a page slug (made locale-relative) or an in-page "#anchor". */
+			primaryCta: z.object({ label: z.string(), href: z.string() }),
+			secondaryCta: z.object({ label: z.string(), href: z.string() }),
 		}),
 		results: z.object({
 			kicker: z.string(),
@@ -35,8 +36,6 @@ const home = defineCollection({
 			kicker: z.string(),
 			title: z.string(),
 			intro: z.string(),
-			teaser: z.string(),
-			cta: z.string(),
 			form: z.record(z.string(), z.string()),
 		}),
 		contact: z.object({
@@ -48,8 +47,6 @@ const home = defineCollection({
 				title: z.string(),
 				intro: z.string(),
 				lastMinute: z.string(),
-				phoneLabel: z.string(),
-				emailLabel: z.string(),
 				members: z.array(z.object({ role: z.string(), name: z.string(), phone: z.string(), email: z.string() })),
 			}),
 			postal: z.object({ title: z.string(), lines: z.array(z.string()) }),

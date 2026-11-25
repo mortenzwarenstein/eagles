@@ -7,11 +7,14 @@
 		"kicker": "UBV The Eagles",
 		"title": "Basketball in",
 		"titleHighlight": "Utrecht.",
-		"cta": {
-			"label": "View the programme",
-			"href": "#fixtures"
+		"primaryCta": {
+			"label": "Become a member",
+			"href": "inschrijven"
 		},
-		"intro": "One of the oldest, smallest and friendliest basketball clubs in Utrecht. Come and watch a game, or just join in."
+		"secondaryCta": {
+			"label": "View the schedule",
+			"href": "#fixtures"
+		}
 	},
 	"results": {
 		"kicker": "Final score",
@@ -28,7 +31,7 @@
 		"kicker": "Coming up",
 		"title": "Next\nmatches",
 		"intro": "Come along and cheer on Men's 1, 2 and 3 at their next game.",
-		"linkLabel": "Full programme",
+		"linkLabel": "Full schedule",
 		"page": {
 			"pageTitle": "Schedule",
 			"pageIntro": "When do we play? All upcoming matches of this season, right here.",
@@ -38,7 +41,7 @@
 	},
 	"join": {
 		"kicker": "Join",
-		"title": "Become a member\nof The Eagles",
+		"title": "Become a member",
 		"intro": "Great that you want to join UBV The Eagles! Fill in this form and we will process your registration.",
 		"form": {
 			"person": "Personal details",
@@ -62,16 +65,14 @@
 			"street": "Street",
 			"city": "City",
 			"jerseyNumber": "Jersey number",
-			"jerseyHint": "If you want to play in the league, enter your preferred jersey number. Another member may already use it, in which case we will find a free number for you.",
+			"jerseyHint": "If you want to play in the league, enter your preferred jersey number. Another member may already use it. In that case, we will find a free number for you.",
 			"membershipHint": "Enter your date of birth first to see the memberships available to you.",
 			"noPlans": "No memberships are available for your age.",
 			"submit": "Sign up",
 			"sending": "Sending…",
 			"success": "Thank you for signing up. We will contact you as soon as possible.",
 			"error": "Your registration did not go through. Please check your details and try again. Already a member? Then you don't need to sign up again."
-		},
-		"cta": "Go to the sign-up form",
-		"teaser": "Want to play basketball with The Eagles? Sign up as a member and join in, or just come and train with us."
+		}
 	},
 	"contact": {
 		"kicker": "Contact",
@@ -108,9 +109,7 @@
 		"board": {
 			"title": "Board",
 			"intro": "The board of UBV The Eagles consists of the following people:",
-			"lastMinute": "For last-minute game matters, please contact Dennis Liersen or Wouter Kitsz.",
-			"phoneLabel": "Phone",
-			"emailLabel": "Email",
+			"lastMinute": "Please contact Wouter Kitsz for last-minute game matters.",
 			"members": [
 				{
 					"role": "Chair",
@@ -132,8 +131,8 @@
 				},
 				{
 					"role": "Match secretary",
-					"name": "Dennis Liersen",
-					"phone": "06-15436462",
+					"name": "Wouter Kitsz",
+					"phone": "06-83910511",
 					"email": "wedsec@utrechteagles.nl"
 				},
 				{

@@ -36,9 +36,13 @@
         html { scroll-behavior: auto; }
         * { transition-duration: 0.01ms !important; }
     }
-    section[id] { scroll-margin-top: 6rem; }
+    /* Sections clear the fixed header with their own top padding, so cancel the scroll-padding
+       above: an anchor lands on the section's top edge instead of showing the end of the previous one. */
+    section[id] { scroll-margin-top: -6rem; }
     :focus-visible { outline: 3px solid var(--color-gold-ink); outline-offset: 2px; }
     body { @apply bg-paper text-navy font-sans; }
+    /* Fill the viewport (body is a min-h-dvh flex column), so short pages don't show a gap below the footer. */
+    body > main { flex-grow: 1; }
     a { @apply text-navy no-underline hover:text-gold-deep; }
     button, a, input { font: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }

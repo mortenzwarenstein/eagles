@@ -7,11 +7,14 @@
 		"kicker": "UBV The Eagles",
 		"title": "Basketbal in",
 		"titleHighlight": "Utrecht.",
-		"cta": {
+		"primaryCta": {
+			"label": "Word lid",
+			"href": "inschrijven"
+		},
+		"secondaryCta": {
 			"label": "Bekijk het programma",
 			"href": "#fixtures"
-		},
-		"intro": "Een van de oudste, kleinste en gezelligste basketbalverenigingen van Utrecht. Kom kijken bij een wedstrijd of speel gewoon mee."
+		}
 	},
 	"results": {
 		"kicker": "Eindstand",
@@ -62,16 +65,14 @@
 			"street": "Straat",
 			"city": "Woonplaats",
 			"jerseyNumber": "Rugnummer",
-			"jerseyHint": "Als je competitie wilt gaan spelen, vul dan je gewenste rugnummer in. Het kan zijn dat een ander lid het nummer al gebruikt, dan gaan we een ander nummer zoeken dat vrij is.",
+			"jerseyHint": "Als je competitie wilt gaan spelen, vul dan je gewenste rugnummer in. Het kan zijn dat een ander lid het nummer al gebruikt. In dat geval zoeken we een vrij nummer voor je.",
 			"membershipHint": "Vul eerst je geboortedatum in om de beschikbare lidmaatschappen te zien.",
 			"noPlans": "Er zijn geen lidmaatschappen beschikbaar voor jouw leeftijd.",
 			"submit": "Aanmelden",
 			"sending": "Versturen…",
 			"success": "Dank voor je aanmelding. Er wordt zo spoedig mogelijk contact met je opgenomen.",
 			"error": "Je aanmelding is niet gelukt. Controleer je gegevens en probeer het opnieuw. Ben je al lid? Dan hoef je je niet nogmaals aan te melden."
-		},
-		"cta": "Naar het aanmeldformulier",
-		"teaser": "Basketballen bij The Eagles? Meld je aan als lid en speel mee, of train gezellig met ons mee."
+		}
 	},
 	"contact": {
 		"kicker": "Contact",
@@ -108,9 +109,7 @@
 		"board": {
 			"title": "Bestuur",
 			"intro": "Het bestuur van UBV The Eagles bestaat uit de volgende personen:",
-			"lastMinute": "Voor last-minute wedstrijdzaken kan contact worden opgenomen met Dennis Liersen of Wouter Kitsz.",
-			"phoneLabel": "Telefoon",
-			"emailLabel": "E-mail",
+			"lastMinute": "Neem voor last-minute wedstrijdzaken contact op met Wouter Kitsz.",
 			"members": [
 				{
 					"role": "Voorzitter",
@@ -132,8 +131,8 @@
 				},
 				{
 					"role": "Wedsec",
-					"name": "Dennis Liersen",
-					"phone": "06-15436462",
+					"name": "Wouter Kitsz",
+					"phone": "06-83910511",
 					"email": "wedsec@utrechteagles.nl"
 				},
 				{

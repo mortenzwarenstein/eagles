@@ -1,12 +1,10 @@
 ---
-import type { GetStaticPaths } from "astro"
 import MainLayout from "../../layouts/main.astro"
 import RegistrationForm from "../../components/RegistrationForm.astro"
 import { fetchPlans } from "../../lib/registration"
-import { defaultLocale, getHomeContent, locales, resolveLocale, useTranslations } from "../../i18n"
+import { getHomeContent, localeStaticPaths, resolveLocale, useTranslations } from "../../i18n"
 
-export const getStaticPaths = (() =>
-	locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }))) satisfies GetStaticPaths
+export const getStaticPaths = localeStaticPaths
 
 const locale = resolveLocale(Astro.currentLocale)
 const t = useTranslations(locale)
